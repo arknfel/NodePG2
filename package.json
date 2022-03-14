@@ -1,0 +1,41 @@
+{
+  "name": "nodepg2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "npx tsc",
+    "init_test_db": "db-migrate db:create mydb_test",
+    "test_env": "set ENV=test",
+    "test": "set ENV=test && db-migrate db:drop mydb_test && db-migrate db:create mydb_test && db-migrate up -e test && npm run build && npx jasmine",
+    "dev": "nodemon --exec npx ts-node \"./src/server.ts\""
+  },
+  "keywords": [
+    "Jasmine",
+    "Typescript",
+    "es6",
+    "module",
+    "example"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/express": "^4.17.13",
+    "@types/jasmine": "^3.10.3",
+    "@types/node": "^17.0.21",
+    "@types/nodemon": "^1.19.1",
+    "@types/pg": "^8.6.5",
+    "body-parser": "^1.19.2",
+    "cross-env": "^7.0.3",
+    "db-migrate": "^0.11.13",
+    "db-migrate-pg": "^1.2.2",
+    "dotenv": "^16.0.0",
+    "express": "^4.17.3",
+    "jasmine": "^4.0.2",
+    "jasmine-spec-reporter": "^7.0.0",
+    "nodemon": "^2.0.15",
+    "pg": "^8.7.3",
+    "ts-node": "^10.7.0",
+    "typescript": "^4.6.2"
+  }
+}
