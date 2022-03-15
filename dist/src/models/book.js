@@ -54,7 +54,7 @@ var BookStore = /** @class */ (function () {
     function BookStore() {
     }
     // GET all books
-    BookStore.prototype.all = function () {
+    BookStore.prototype.index = function () {
         return __awaiter(this, void 0, void 0, function () {
             var conn, sql, result, err_1;
             return __generator(this, function (_a) {

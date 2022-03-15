@@ -15,7 +15,7 @@ export type Book = {
 export class BookStore {
 
   // GET all books
-  async all(): Promise<(Book)[]> {
+  async index(): Promise<(Book)[]> {
     try {
       const conn = await client.connect();
       

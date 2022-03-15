@@ -5,17 +5,14 @@ const store = new BookStore();
 
 
 describe("Book Model", () => {
-  it('should have an \'all\' method', () => {
-    expect(store.all).toBeDefined();
-  });
 
   it('\'all\' method should return a list', async () => {
-    const result = await store.all();
+    const result = await store.index();
     expect(result).toEqual([]);
   });
 
     it('should have method all()', () => {
-    expect(store.all).toBeDefined();
+    expect(store.index).toBeDefined();
   });
   
   it('should have method get()', () => {
@@ -52,7 +49,7 @@ describe("Book Model", () => {
 
   it('delete method should remove the book', async () => {
     store.delete("1");
-    const result = await store.all();
+    const result = await store.index();
     expect(result).toEqual([]);
   });
 });

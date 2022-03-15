@@ -39,14 +39,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var book_1 = require("../../src/models/book");
 var store = new book_1.BookStore();
 describe("Book Model", function () {
-    it('should have an \'all\' method', function () {
-        expect(store.all).toBeDefined();
-    });
     it('\'all\' method should return a list', function () { return __awaiter(void 0, void 0, void 0, function () {
         var result;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, store.all()];
+                case 0: return [4 /*yield*/, store.index()];
                 case 1:
                     result = _a.sent();
                     expect(result).toEqual([]);
@@ -54,19 +51,19 @@ describe("Book Model", function () {
             }
         });
     }); });
-    it('should have an \'all\' method', function () {
-        expect(store.all).toBeDefined();
+    it('should have method all()', function () {
+        expect(store.index).toBeDefined();
     });
-    it('should have an \'all\' method', function () {
+    it('should have method get()', function () {
         expect(store.get).toBeDefined();
     });
-    it('should have an \'all\' method', function () {
+    it('should have method create()', function () {
         expect(store.create).toBeDefined();
     });
-    it('should have an \'all\' method', function () {
+    it('should have method update()', function () {
         expect(store.update).toBeDefined();
     });
-    it('should have an \'all\' method', function () {
+    it('should have method delete()', function () {
         expect(store.delete).toBeDefined();
     });
     it('\'create method should add a book\'', function () { return __awaiter(void 0, void 0, void 0, function () {
@@ -98,7 +95,7 @@ describe("Book Model", function () {
             switch (_a.label) {
                 case 0:
                     store.delete("1");
-                    return [4 /*yield*/, store.all()];
+                    return [4 /*yield*/, store.index()];
                 case 1:
                     result = _a.sent();
                     expect(result).toEqual([]);
