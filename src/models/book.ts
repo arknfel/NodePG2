@@ -1,4 +1,3 @@
-import { QueryResult } from 'pg';
 import client from '../database';
 
 // export const bookPath = path.join(__dirname, __filename);

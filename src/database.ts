@@ -10,11 +10,12 @@ const {
   POSTGRES_TEST_DB,
   POSTGRES_USER,
   POSTGRES_PASSWORD,
+  ENV
 } = process.env;
 
 
-let ENV = process.env.ENV;
-ENV = ((ENV as unknown) as string).replace(/\s+/, '');
+// let ENV = process.env.ENV;
+// ENV = ((ENV as unknown) as string).replace(/\s+/, '');
 
 let client;
 
