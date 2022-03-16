@@ -39,67 +39,43 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var authz_1 = __importDefault(require("../middlewares/authz"));
-var book_1 = require("../models/book");
-var store = new book_1.BookStore();
-var index = function (_req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var result;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, store.index()];
-            case 1:
-                result = _a.sent();
-                res.json(result);
-                return [2 /*return*/];
-        }
-    });
-}); };
-var get = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var result;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, store.get(req.params.id)];
-            case 1:
-                result = _a.sent();
-                res.json(result);
-                return [2 /*return*/];
-        }
-    });
-}); };
+var user_1 = require("../models/user");
+var jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+var store = new user_1.UserStore();
 var create = function (_req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var result, err_1;
+    var user, newUser, secret, token, err_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                _a.trys.push([0, 2, , 3]);
-                return [4 /*yield*/, store.create({
-                        title: _req.body.title,
-                        total_pages: _req.body.total_pages,
-                        author: _req.body.author,
-                        summary: _req.body.summary
-                    })];
+                user = {
+                    username: _req.body.username,
+                    email_address: _req.body.email_address,
+                    password: _req.body.password
+                };
+                _a.label = 1;
             case 1:
-                result = _a.sent();
-                res.json(result);
-                return [3 /*break*/, 3];
+                _a.trys.push([1, 3, , 4]);
+                return [4 /*yield*/, store.create(user)];
             case 2:
+                newUser = _a.sent();
+                secret = process.env.TOKEN_SECRET;
+                token = jsonwebtoken_1.default.sign({ user: newUser }, secret);
+                res.json(token);
+                return [3 /*break*/, 4];
+            case 3:
                 err_1 = _a.sent();
-                res.status(400).json(err_1);
-                return [2 /*return*/];
-            case 3: return [2 /*return*/];
+                res.status(400);
+                res.json(err_1 + user);
+                return [3 /*break*/, 4];
+            case 4: return [2 /*return*/];
         }
     });
 }); };
-var update = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+var login = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var result;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, store.update(req.params.id, {
-                    title: req.body.title,
-                    total_pages: req.body.total_pages,
-                    author: req.body.author,
-                    summary: req.body.summary
-                })];
+            case 0: return [4 /*yield*/, store.authenticate(req.body.username, req.body.password)];
             case 1:
                 result = _a.sent();
                 res.json(result);
@@ -107,23 +83,8 @@ var update = function (req, res) { return __awaiter(void 0, void 0, void 0, func
         }
     });
 }); };
-var del = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var result;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, store.delete(req.params.id)];
-            case 1:
-                result = _a.sent();
-                res.json(result);
-                return [2 /*return*/];
-        }
-    });
-}); };
-var booksRoutes = function (app) {
-    app.get('/books', index);
-    app.get('/books/:id', get);
-    app.post('/books', authz_1.default, create);
-    app.put('/books/:id', authz_1.default, update);
-    app.delete('/books/:id', authz_1.default, del);
+var usersRoutes = function (app) {
+    app.post('/users/login', login);
+    app.post('/users', create);
 };
-exports.default = booksRoutes;
+exports.default = usersRoutes;
