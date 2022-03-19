@@ -35,118 +35,89 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-var user_1 = require("../models/user");
-var jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-var authz_1 = __importDefault(require("../middlewares/authz"));
-var store = new user_1.UserStore();
-var index = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var users, err_1;
+var product_1 = require("../models/product");
+var store = new product_1.ProductStore();
+var index = function (_req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var products, err_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 _a.trys.push([0, 2, , 3]);
                 return [4 /*yield*/, store.index()];
             case 1:
-                users = _a.sent();
-                res.json(users);
+                products = _a.sent();
+                res.json(products);
                 return [3 /*break*/, 3];
             case 2:
                 err_1 = _a.sent();
-                return [2 /*return*/, res.status(400).json('Unable to get users.')];
+                res.status(400).json("".concat(err_1));
+                return [3 /*break*/, 3];
             case 3: return [2 /*return*/];
         }
     });
 }); };
 var get = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var user, err_2;
+    var product, err_2;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 _a.trys.push([0, 2, , 3]);
-                if (!req.params.user_id) {
-                    return [2 /*return*/, res.status(401).json('Missing field firstname.')];
-                }
-                return [4 /*yield*/, store.get(req.params.user_id)];
+                return [4 /*yield*/, store.get(req.params.id)];
             case 1:
-                user = _a.sent();
-                res.json(user);
+                product = _a.sent();
+                res.json(product);
                 return [3 /*break*/, 3];
             case 2:
                 err_2 = _a.sent();
-                return [2 /*return*/, res.status(400).json('Unable to get user.')];
+                res.status(400).json("".concat(err_2));
+                return [3 /*break*/, 3];
             case 3: return [2 /*return*/];
         }
     });
 }); };
 var create = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var newUser, secret, token, err_3;
+    var product, err_3;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                if (!req.body.firstname
-                    || !req.body.lastname
-                    || !req.body.password) {
-                    return [2 /*return*/, res.status(401).json('Missing required fields.')];
-                }
-                _a.label = 1;
+                _a.trys.push([0, 2, , 3]);
+                return [4 /*yield*/, store.create(req.body)];
             case 1:
-                _a.trys.push([1, 3, , 4]);
-                return [4 /*yield*/, store.create({
-                        firstname: req.body.firstname,
-                        lastname: req.body.lastname,
-                        password: req.body.password
-                    })];
+                product = _a.sent();
+                res.json(product);
+                return [3 /*break*/, 3];
             case 2:
-                newUser = _a.sent();
-                if (!newUser) {
-                    return [2 /*return*/, res.status(401).json('User exists.')];
-                }
-                secret = process.env.TOKEN_SECRET;
-                token = jsonwebtoken_1.default.sign({ user: newUser }, secret);
-                res.setHeader('Authorization', "Bearer ".concat(token));
-                res.json('token generated');
-                return [3 /*break*/, 4];
-            case 3:
                 err_3 = _a.sent();
-                res.status(400);
-                res.json(err_3);
-                return [3 /*break*/, 4];
-            case 4: return [2 /*return*/];
+                res.status(400).json("".concat(err_3));
+                return [3 /*break*/, 3];
+            case 3: return [2 /*return*/];
         }
     });
 }); };
-var login = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var user, secret, token;
+var hot = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var products, err_4;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                if (!req.body.firstname || !req.body.password) {
-                    return [2 /*return*/, res.status(401).json('invalid credntials')];
-                }
-                return [4 /*yield*/, store.authenticate(req.body.firstname, req.body.password)];
+                _a.trys.push([0, 2, , 3]);
+                return [4 /*yield*/, store.hot()];
             case 1:
-                user = _a.sent();
-                if (user) {
-                    secret = process.env.TOKEN_SECRET;
-                    token = jsonwebtoken_1.default.sign({ user: user }, secret);
-                    res.setHeader('Authorization', "Bearer ".concat(token));
-                    res.json('token generated');
-                }
-                else {
-                    res.status(401).json('User does not exist, may need to signup');
-                }
-                return [2 /*return*/];
+                products = _a.sent();
+                res.json(products);
+                return [3 /*break*/, 3];
+            case 2:
+                err_4 = _a.sent();
+                res.status(400).json("".concat(err_4));
+                return [3 /*break*/, 3];
+            case 3: return [2 /*return*/];
         }
     });
 }); };
-var usersRoutes = function (app) {
-    app.get('/users', authz_1.default, index);
-    app.get('/users/:user_id', get);
-    app.post('/users/login', login);
-    app.post('/users', create);
+var productsRoutes = function (app) {
+    app.get('/products', index);
+    app.get('/products/:id', get); // Show
+    app.post('/products', create);
+    app.get('/products/trends', hot);
 };
-exports.default = usersRoutes;
+exports.default = productsRoutes;

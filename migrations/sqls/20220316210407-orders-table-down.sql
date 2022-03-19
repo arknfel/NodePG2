@@ -1,0 +1,2 @@
+/* DOWM */
+DROP TABLE orders;

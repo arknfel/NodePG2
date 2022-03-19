@@ -39,25 +39,22 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UserStore = void 0;
+exports.OrderStore = void 0;
 var database_1 = __importDefault(require("../database"));
-var bcrypt_1 = __importDefault(require("bcrypt"));
-var pepper = process.env.BCRYPT_PW;
-var saltRounds = process.env.SALT_R;
-var UserStore = /** @class */ (function () {
-    function UserStore() {
+var OrderStore = /** @class */ (function () {
+    function OrderStore() {
     }
-    UserStore.prototype.index = function () {
+    OrderStore.prototype.index = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var conn, sql, result, err_1;
+            var sql, conn, result, err_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 3, , 4]);
+                        sql = 'SELECT * from orders';
                         return [4 /*yield*/, database_1.default.connect()];
                     case 1:
                         conn = _a.sent();
-                        sql = 'SELECT * from users;';
                         return [4 /*yield*/, conn.query(sql)];
                     case 2:
                         result = _a.sent();
@@ -65,116 +62,95 @@ var UserStore = /** @class */ (function () {
                         return [2 /*return*/, result.rows];
                     case 3:
                         err_1 = _a.sent();
-                        throw new Error("unable to get users: ".concat(err_1));
+                        throw new Error("unable to get orders: ".concat(err_1));
                     case 4: return [2 /*return*/];
                 }
             });
         });
     };
     ;
-    UserStore.prototype.get = function (user_id) {
+    OrderStore.prototype.get = function (user_id) {
         return __awaiter(this, void 0, void 0, function () {
-            var conn, sql, result, user, err_2;
+            var sql, conn, result, err_2;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 3, , 4]);
+                        sql = 'SELECT * from orders WHERE user_id=($1)';
                         return [4 /*yield*/, database_1.default.connect()];
                     case 1:
                         conn = _a.sent();
-                        sql = 'SELECT * FROM users WHERE id=($1);';
                         return [4 /*yield*/, conn.query(sql, [user_id])];
                     case 2:
                         result = _a.sent();
                         conn.release();
-                        user = result.rows[0];
-                        return [2 /*return*/, {
-                                id: user.id,
-                                firstname: user.firstname,
-                                lastname: user.lastname
-                            }];
+                        return [2 /*return*/, result.rows[0]];
                     case 3:
                         err_2 = _a.sent();
-                        throw err_2;
+                        throw new Error("unable to get order: ".concat(err_2));
                     case 4: return [2 /*return*/];
                 }
             });
         });
     };
-    UserStore.prototype.create = function (user) {
+    ;
+    OrderStore.prototype.create = function (order) {
         return __awaiter(this, void 0, void 0, function () {
-            var conn, userExists, sql, hash, result, err_3;
+            var sql, conn, result, err_3;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        _a.trys.push([0, 4, , 5]);
+                        _a.trys.push([0, 3, , 4]);
+                        sql = 'INSERT INTO orders (user_id, status) \
+        VALUES ($1, $2) RETURNING *;';
                         return [4 /*yield*/, database_1.default.connect()];
                     case 1:
                         conn = _a.sent();
-                        return [4 /*yield*/, this.userExists(user.firstname, conn)];
+                        return [4 /*yield*/, conn.query(sql, [order.user_id, order.status])];
                     case 2:
-                        userExists = _a.sent();
-                        if (userExists.length > 0) {
-                            return [2 /*return*/, null];
-                        }
-                        sql = 'INSERT INTO users (firstname, \
-        lastname, password) \
-        VALUES ($1, $2, $3) RETURNING *;';
-                        hash = bcrypt_1.default.hashSync(user.password + pepper, parseInt(saltRounds));
-                        return [4 /*yield*/, conn.query(sql, [user.firstname, user.lastname, hash])];
-                    case 3:
                         result = _a.sent();
                         conn.release();
                         return [2 /*return*/, result.rows[0]];
-                    case 4:
+                    case 3:
                         err_3 = _a.sent();
-                        throw err_3;
-                    case 5: return [2 /*return*/];
+                        throw new Error("unable to create order: ".concat(err_3));
+                    case 4: return [2 /*return*/];
                 }
             });
         });
     };
     ;
-    UserStore.prototype.userExists = function (firstname, conn) {
+    OrderStore.prototype.addProduct = function (orderProductEntry) {
         return __awaiter(this, void 0, void 0, function () {
-            var sql, result;
+            var sql, conn, result, err_4;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        sql = 'SELECT * FROM users \
-      WHERE firstname=($1);';
-                        return [4 /*yield*/, conn.query(sql, [firstname])];
-                    case 1:
-                        result = _a.sent();
-                        return [2 /*return*/, result.rows];
-                }
-            });
-        });
-    };
-    ;
-    UserStore.prototype.authenticate = function (firstname, password) {
-        return __awaiter(this, void 0, void 0, function () {
-            var conn, result, user;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, database_1.default.connect()];
+                        _a.trys.push([0, 3, , 4]);
+                        sql = 'INSERT INTO order_products (\
+        quantity, order_id, product_id) VALUES \
+        ($1, $2, $3) RETURNING *;';
+                        return [4 /*yield*/, database_1.default.connect()];
                     case 1:
                         conn = _a.sent();
-                        return [4 /*yield*/, this.userExists(firstname, conn)];
+                        return [4 /*yield*/, conn.query(sql, [
+                                orderProductEntry.quantity,
+                                orderProductEntry.order_id,
+                                orderProductEntry.product_id
+                            ])];
                     case 2:
                         result = _a.sent();
-                        if (result.length > 0) {
-                            user = result[0];
-                            if (bcrypt_1.default.compareSync(password + pepper, user.password)) {
-                                return [2 /*return*/, { id: user.id, firstname: user.firstname }];
-                            }
-                        }
-                        return [2 /*return*/, null];
+                        conn.release();
+                        return [2 /*return*/, result.rows[0]];
+                    case 3:
+                        err_4 = _a.sent();
+                        throw new Error("".concat(err_4));
+                    case 4: return [2 /*return*/];
                 }
             });
         });
     };
     ;
-    return UserStore;
+    return OrderStore;
 }());
-exports.UserStore = UserStore;
+exports.OrderStore = OrderStore;

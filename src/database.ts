@@ -17,7 +17,7 @@ const {
 // let ENV = process.env.ENV;
 // ENV = ((ENV as unknown) as string).replace(/\s+/, '');
 
-let client;
+let client: Pool;
 
 if (ENV === 'dev') {
   client = new Pool({
@@ -43,4 +43,4 @@ else {
 
 console.log(`env: ${ENV}`);
 
-export default (client as unknown) as Pool;
+export default client;
