@@ -80,11 +80,11 @@ const login = async (req: Request, res: Response) => {
   }
 }
 
-const usersRoutes = (app: express.Application) => {
+const usersRouter = (app: express.Application) => {
   app.get('/users', verifyAuthToken, index);
   app.get('/users/:user_id', verifyAuthToken, get);
   app.post('/users/login', login);
   app.post('/users', create);
 }
 
-export default usersRoutes;
+export default usersRouter;

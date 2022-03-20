@@ -41,6 +41,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.OrderStore = void 0;
 var database_1 = __importDefault(require("../database"));
+var utils_1 = require("./utils");
 var OrderStore = /** @class */ (function () {
     function OrderStore() {
     }
@@ -62,7 +63,7 @@ var OrderStore = /** @class */ (function () {
                         return [2 /*return*/, result.rows];
                     case 3:
                         err_1 = _a.sent();
-                        throw new Error("unable to get orders: ".concat(err_1));
+                        throw new Error("unable to get orders:\n".concat(err_1));
                     case 4: return [2 /*return*/];
                 }
             });
@@ -84,10 +85,10 @@ var OrderStore = /** @class */ (function () {
                     case 2:
                         result = _a.sent();
                         conn.release();
-                        return [2 /*return*/, result.rows[0]];
+                        return [2 /*return*/, result.rows];
                     case 3:
                         err_2 = _a.sent();
-                        throw new Error("unable to get order: ".concat(err_2));
+                        throw new Error("unable to get order:\n".concat(err_2));
                     case 4: return [2 /*return*/];
                 }
             });
@@ -102,55 +103,151 @@ var OrderStore = /** @class */ (function () {
                     case 0:
                         _a.trys.push([0, 3, , 4]);
                         sql = 'INSERT INTO orders (user_id, status) \
-        VALUES ($1, $2) RETURNING *;';
+        VALUES ($1, \'active\') RETURNING *;';
                         return [4 /*yield*/, database_1.default.connect()];
                     case 1:
                         conn = _a.sent();
-                        return [4 /*yield*/, conn.query(sql, [order.user_id, order.status])];
+                        return [4 /*yield*/, conn.query(sql, [order.user_id])];
                     case 2:
                         result = _a.sent();
                         conn.release();
                         return [2 /*return*/, result.rows[0]];
                     case 3:
                         err_3 = _a.sent();
-                        throw new Error("unable to create order: ".concat(err_3));
+                        throw new Error("unable to create order:\n".concat(err_3));
                     case 4: return [2 /*return*/];
                 }
             });
         });
     };
     ;
-    OrderStore.prototype.addProduct = function (orderProductEntry) {
+    OrderStore.prototype.checkOrderStatus = function (order_id, currentConn) {
         return __awaiter(this, void 0, void 0, function () {
             var sql, conn, result, err_4;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 3, , 4]);
-                        sql = 'INSERT INTO order_products (\
-        quantity, order_id, product_id) VALUES \
-        ($1, $2, $3) RETURNING *;';
-                        return [4 /*yield*/, database_1.default.connect()];
+                        sql = 'SELECT * FROM orders \
+        WHERE id=($1);';
+                        return [4 /*yield*/, (0, utils_1.connAvail)(currentConn, database_1.default)];
                     case 1:
                         conn = _a.sent();
-                        return [4 /*yield*/, conn.query(sql, [
-                                orderProductEntry.quantity,
-                                orderProductEntry.order_id,
-                                orderProductEntry.product_id
-                            ])];
+                        return [4 /*yield*/, conn.query(sql, [order_id])];
                     case 2:
                         result = _a.sent();
-                        conn.release();
+                        if (!currentConn) {
+                            conn.release;
+                        }
                         return [2 /*return*/, result.rows[0]];
                     case 3:
                         err_4 = _a.sent();
-                        throw new Error("".concat(err_4));
+                        throw new Error("Unable to check order status:\n".concat(err_4));
                     case 4: return [2 /*return*/];
                 }
             });
         });
     };
     ;
+    OrderStore.prototype.addProduct = function (order_id, quantity, product_id) {
+        return __awaiter(this, void 0, void 0, function () {
+            var sql, conn, order, result, err_5;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 4, , 5]);
+                        sql = 'INSERT INTO order_products (\
+        quantity, order_id, product_id) VALUES \
+        ($1, $2, $3) RETURNING *;';
+                        return [4 /*yield*/, database_1.default.connect()];
+                    case 1:
+                        conn = _a.sent();
+                        return [4 /*yield*/, this.checkOrderStatus(order_id, conn)];
+                    case 2:
+                        order = _a.sent();
+                        if (order.status == 'complete') {
+                            conn.release();
+                            throw new Error("order ".concat(order_id, " is already closed"));
+                        }
+                        return [4 /*yield*/, conn.query(sql, [
+                                quantity,
+                                order_id,
+                                product_id
+                            ])];
+                    case 3:
+                        result = _a.sent();
+                        conn.release();
+                        return [2 /*return*/, result.rows[0]];
+                    case 4:
+                        err_5 = _a.sent();
+                        throw new Error("Unable to add product:\n\t".concat(err_5));
+                    case 5: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    ;
+    OrderStore.prototype.closeOrder = function (order_id, currentConn) {
+        return __awaiter(this, void 0, void 0, function () {
+            var conn, order, sql, result, err_6;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 4, , 5]);
+                        return [4 /*yield*/, (0, utils_1.connAvail)(currentConn, database_1.default)];
+                    case 1:
+                        conn = _a.sent();
+                        return [4 /*yield*/, this.checkOrderStatus(order_id, conn)];
+                    case 2:
+                        order = _a.sent();
+                        if (order.status == 'complete') {
+                            throw new Error("order ".concat(order_id, " is already closed"));
+                        }
+                        sql = 'UPDATE orders SET status=\'complete\' \
+      WHERE id=($1) RETURNING *;';
+                        return [4 /*yield*/, conn.query(sql, [order_id])];
+                    case 3:
+                        result = _a.sent();
+                        return [2 /*return*/, result.rows[0]];
+                    case 4:
+                        err_6 = _a.sent();
+                        throw new Error("Unable to close order ".concat(order_id, ": \n\t").concat(err_6));
+                    case 5: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    ;
+    OrderStore.prototype.getProducts = function (order_id, currentConn) {
+        return __awaiter(this, void 0, void 0, function () {
+            var sql, conn, result, err_7;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        sql = 'SELECT p.name as name, SUM(op.quantity) AS quantity \
+      , p.price AS price, SUM(p.price*op.quantity) AS cost \
+      FROM products p JOIN order_products op ON p.id=op.product_id \
+      WHERE op.order_id=($1) \
+      group by p.id, p.name, p.price;';
+                        _a.label = 1;
+                    case 1:
+                        _a.trys.push([1, 4, , 5]);
+                        return [4 /*yield*/, (0, utils_1.connAvail)(currentConn, database_1.default)];
+                    case 2:
+                        conn = _a.sent();
+                        return [4 /*yield*/, conn.query(sql, [order_id])];
+                    case 3:
+                        result = _a.sent();
+                        return [2 /*return*/, result.rows];
+                    case 4:
+                        err_7 = _a.sent();
+                        throw new Error("Unable to get products of ".concat(order_id, ": \n\t").concat(err_7));
+                    case 5: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    ;
     return OrderStore;
-}());
+}()); // class OrderStore ends
 exports.OrderStore = OrderStore;

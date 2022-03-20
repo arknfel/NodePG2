@@ -49,7 +49,7 @@ const del = async (req: Request, res: Response) => {
 }
 
 
-const booksRoutes = (app: express.Application) => {
+const booksRouter = (app: express.Application) => {
   app.get('/books', index);
   app.get('/books/:id', get);
   app.post('/books', verifyAuthToken, create);
@@ -58,4 +58,4 @@ const booksRoutes = (app: express.Application) => {
 };
 
 
-export default booksRoutes;
+export default booksRouter;

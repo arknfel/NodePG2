@@ -42,6 +42,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserStore = void 0;
 var database_1 = __importDefault(require("../database"));
 var bcrypt_1 = __importDefault(require("bcrypt"));
+var utils_1 = require("./utils");
 var pepper = process.env.BCRYPT_PW;
 var saltRounds = process.env.SALT_R;
 var UserStore = /** @class */ (function () {
@@ -72,14 +73,14 @@ var UserStore = /** @class */ (function () {
         });
     };
     ;
-    UserStore.prototype.get = function (user_id) {
+    UserStore.prototype.get = function (user_id, currentConn) {
         return __awaiter(this, void 0, void 0, function () {
             var conn, sql, result, user, err_2;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 3, , 4]);
-                        return [4 /*yield*/, database_1.default.connect()];
+                        return [4 /*yield*/, (0, utils_1.connAvail)(currentConn, database_1.default)];
                     case 1:
                         conn = _a.sent();
                         sql = 'SELECT * FROM users WHERE id=($1);';
@@ -125,10 +126,14 @@ var UserStore = /** @class */ (function () {
                     case 3:
                         result = _a.sent();
                         conn.release();
-                        return [2 /*return*/, result.rows[0]];
+                        return [2 /*return*/, {
+                                id: result.rows[0].id,
+                                firstname: result.rows[0].firstname,
+                                lastname: result.rows[0].lastname
+                            }];
                     case 4:
                         err_3 = _a.sent();
-                        throw err_3;
+                        throw new Error("Unable to create user:\n\t".concat(err_3));
                     case 5: return [2 /*return*/];
                 }
             });
@@ -163,6 +168,7 @@ var UserStore = /** @class */ (function () {
                         return [4 /*yield*/, this.userExists(firstname, conn)];
                     case 2:
                         result = _a.sent();
+                        conn.release();
                         if (result.length > 0) {
                             user = result[0];
                             if (bcrypt_1.default.compareSync(password + pepper, user.password)) {

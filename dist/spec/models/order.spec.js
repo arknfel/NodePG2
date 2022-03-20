@@ -35,22 +35,16 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-var user_1 = require("../../src/models/user");
-var database_1 = __importDefault(require("../../src/database"));
-var store = new user_1.UserStore();
-fdescribe("User Model", function () { return __awaiter(void 0, void 0, void 0, function () {
-    var user;
-    return __generator(this, function (_a) {
-        user = {
-            firstname: "testUser",
-            lastname: "lastname",
-            password: "UshallnotPASS"
-        };
-        it('index() returns []', function () { return __awaiter(void 0, void 0, void 0, function () {
+var order_1 = require("../../src/models/order");
+var process_1 = require("process");
+var store = new order_1.OrderStore();
+xdescribe("Order Model", function () {
+    var order = {
+        user_id: 1
+    };
+    it('index() returns []', function () {
+        (0, process_1.nextTick)(function () { return __awaiter(void 0, void 0, void 0, function () {
             var result;
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -62,71 +56,38 @@ fdescribe("User Model", function () { return __awaiter(void 0, void 0, void 0, f
                 }
             });
         }); });
-        it('method create() return a User', function () { return __awaiter(void 0, void 0, void 0, function () {
+    });
+    it('create() returns a User', function (done) {
+        (0, process_1.nextTick)(function () { return __awaiter(void 0, void 0, void 0, function () {
             var result;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, store.create(user)];
+                    case 0: return [4 /*yield*/, store.create(order)];
                     case 1:
                         result = _a.sent();
                         expect(result).toEqual({
-                            id: 1,
-                            firstname: 'testUser',
-                            lastname: 'lastname'
+                            id: '1',
+                            user_id: '1',
+                            status: 'active',
                         });
+                        done();
                         return [2 /*return*/];
                 }
             });
         }); });
-        it('method get(user_id) return a User by id', function () { return __awaiter(void 0, void 0, void 0, function () {
+    });
+    it('get() returns a user by id', function () {
+        (0, process_1.nextTick)(function () { return __awaiter(void 0, void 0, void 0, function () {
             var result;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, store.get('1')];
                     case 1:
                         result = _a.sent();
-                        expect(result).toEqual({
-                            id: 1,
-                            firstname: 'testUser',
-                            lastname: 'lastname'
-                        });
+                        expect(result).toEqual([]);
                         return [2 /*return*/];
                 }
             });
         }); });
-        it('method userExists() return a User if exists', function () { return __awaiter(void 0, void 0, void 0, function () {
-            var conn, result;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, database_1.default.connect()];
-                    case 1:
-                        conn = _a.sent();
-                        return [4 /*yield*/, store.userExists(user.firstname, conn)];
-                    case 2:
-                        result = _a.sent();
-                        conn.release();
-                        expect(result.length).toEqual(1);
-                        return [2 /*return*/];
-                }
-            });
-        }); });
-        it('method authenticate() return User or null', function () { return __awaiter(void 0, void 0, void 0, function () {
-            var result;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, store.authenticate(user.firstname, user.password)];
-                    case 1:
-                        result = _a.sent();
-                        expect(result === null || result === void 0 ? void 0 : result.id).toEqual(1);
-                        return [4 /*yield*/, store.authenticate(user.firstname, 'AwrongPass')];
-                    case 2:
-                        // invalid password
-                        result = _a.sent();
-                        expect(result).toEqual(null);
-                        return [2 /*return*/];
-                }
-            });
-        }); });
-        return [2 /*return*/];
     });
-}); });
+});

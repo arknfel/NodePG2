@@ -1,5 +1,6 @@
 import express, { Request, Response } from 'express';
 import { Product, ProductUpdates, ProductStore } from "../models/product";
+import verifyAuthToken from '../middlewares/authz';
 
 
 const store = new ProductStore();
@@ -42,12 +43,12 @@ const hot = async (req: Request, res: Response) => {
 };
 
 
-const productsRoutes = (app: express.Application) => {
+const productsRouter = (app: express.Application) => {
   app.get('/products', index);
   app.get('/products/:id', get);  // Show
-  app.post('/products', create);
+  app.post('/products', verifyAuthToken, create);
   app.get('/products/trends', hot)
 };
 
 
-export default productsRoutes;
+export default productsRouter;

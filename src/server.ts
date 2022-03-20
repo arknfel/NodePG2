@@ -1,9 +1,8 @@
-import bodyParser from 'body-parser';
 import express from 'express';
-import booksRoutes from './handlers/books';
-import ordersRoutes from './handlers/orders';
-import productsRoutes from './handlers/products';
-import usersRoutes from './handlers/users';
+import booksRouter from './handlers/books';
+import ordersRouter from './handlers/orders';
+import productsRouter from './handlers/products';
+import usersRouter from './handlers/users';
 
 
 const app = express();
@@ -13,10 +12,10 @@ const PORT: number = 3000;
 
 app.use(express.json());
 
-booksRoutes(app);
-usersRoutes(app);
-productsRoutes(app);
-ordersRoutes(app);
+booksRouter(app);
+usersRouter(app);
+productsRouter(app);
+ordersRouter(app);
 
 
 app.listen(3000, function () {

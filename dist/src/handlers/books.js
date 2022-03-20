@@ -119,11 +119,11 @@ var del = function (req, res) { return __awaiter(void 0, void 0, void 0, functio
         }
     });
 }); };
-var booksRoutes = function (app) {
+var booksRouter = function (app) {
     app.get('/books', index);
     app.get('/books/:id', get);
     app.post('/books', authz_1.default, create);
     app.put('/books/:id', authz_1.default, update);
     app.delete('/books/:id', authz_1.default, del);
 };
-exports.default = booksRoutes;
+exports.default = booksRouter;

@@ -1,19 +1,21 @@
 import client from '../database';
 import bcrypt from 'bcrypt';
-import { PoolClient } from 'pg';
+import { PoolClient, QueryResult } from 'pg';
+import { connAvail } from './utils';
+
 
 const pepper = process.env.BCRYPT_PW;
 const saltRounds = (process.env.SALT_R as unknown) as string;
 
 export type User = {
-  id?: string|number;
+  id?: number|string;
   firstname: string;
   lastname: string;
   password: string;
 };
 
 export type UserEntry = {
-  id?: string|number;
+  id?: number|string;
   firstname?: string;
   lastname?: string;
   password?: string;
@@ -33,11 +35,11 @@ export class UserStore {
     }
   };
 
-  async get(user_id: string): Promise<UserEntry> {
+  async get(user_id: string, currentConn?: PoolClient): Promise<UserEntry> {
     try {
-      const conn = await client.connect();
+      const conn = await connAvail(currentConn, client);
       const sql = 'SELECT * FROM users WHERE id=($1);';
-      const result = await conn.query(sql, [user_id]);
+      const result: QueryResult<User> = await conn.query(sql, [user_id]);
       conn.release();
       const user = result.rows[0]
       return {
@@ -50,7 +52,7 @@ export class UserStore {
     }
   }
 
-  async create(user: User): Promise<User|null> {
+  async create(user: User): Promise<UserEntry|null> {
     try {
 
       const conn = await client.connect()
@@ -72,10 +74,14 @@ export class UserStore {
         [user.firstname, user.lastname, hash]
       );
       conn.release();
-      return result.rows[0];
+      return {
+        id: result.rows[0].id,
+        firstname: result.rows[0].firstname,
+        lastname: result.rows[0].lastname
+      };
 
     } catch (err) {
-      throw err;
+      throw new Error(`Unable to create user:\n\t${err}`);
     }
   };
 
@@ -92,6 +98,7 @@ export class UserStore {
 
     const conn = await client.connect();
     const result = await this.userExists(firstname, conn);
+    conn.release();
 
     if ( result.length > 0 ) {
       let user = result[0]; 

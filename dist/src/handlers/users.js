@@ -143,10 +143,10 @@ var login = function (req, res) { return __awaiter(void 0, void 0, void 0, funct
         }
     });
 }); };
-var usersRoutes = function (app) {
+var usersRouter = function (app) {
     app.get('/users', authz_1.default, index);
-    app.get('/users/:user_id', get);
+    app.get('/users/:user_id', authz_1.default, get);
     app.post('/users/login', login);
     app.post('/users', create);
 };
-exports.default = usersRoutes;
+exports.default = usersRouter;

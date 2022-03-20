@@ -62,15 +62,15 @@ var index = function (_req, res) { return __awaiter(void 0, void 0, void 0, func
     });
 }); };
 var get = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var product, err_2;
+    var order, err_2;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 _a.trys.push([0, 2, , 3]);
-                return [4 /*yield*/, store.get(req.params.id)];
+                return [4 /*yield*/, store.get(req.params.user_id)];
             case 1:
-                product = _a.sent();
-                res.json(product);
+                order = _a.sent();
+                res.json(order);
                 return [3 /*break*/, 3];
             case 2:
                 err_2 = _a.sent();
@@ -100,34 +100,106 @@ var create = function (req, res) { return __awaiter(void 0, void 0, void 0, func
     });
 }); };
 var addProduct = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var orderProductsEntry, addedProduct, err_4;
+    var addedProduct, closedOrder, orderProducts, err_4;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 5, , 6]);
+                return [4 /*yield*/, store.addProduct(req.params.order_id, req.body.quantity, req.body.product_id)];
+            case 1:
+                addedProduct = _a.sent();
+                if (!(req.query.status && req.query.status == 'complete')) return [3 /*break*/, 4];
+                return [4 /*yield*/, store.closeOrder(req.params.order_id)];
+            case 2:
+                closedOrder = _a.sent();
+                return [4 /*yield*/, store.getProducts(req.params.order_id)];
+            case 3:
+                orderProducts = _a.sent();
+                return [2 /*return*/, res.json({
+                        message: 'order complete',
+                        order: closedOrder,
+                        products: orderProducts
+                    })];
+            case 4:
+                res.json({
+                    product: addedProduct,
+                });
+                return [3 /*break*/, 6];
+            case 5:
+                err_4 = _a.sent();
+                res.status(400).json("".concat(err_4));
+                return [3 /*break*/, 6];
+            case 6: return [2 /*return*/];
+        }
+    });
+}); };
+var closeOrder = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var closedOrder, err_5;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 _a.trys.push([0, 2, , 3]);
-                orderProductsEntry = {
-                    quantity: req.body.quantity,
-                    order_id: req.params.id,
-                    product_id: req.body.product_id
-                };
-                return [4 /*yield*/, store.addProduct(orderProductsEntry)];
+                return [4 /*yield*/, store.closeOrder(req.params.order_id)];
             case 1:
-                addedProduct = _a.sent();
-                res.json(addedProduct);
+                closedOrder = _a.sent();
+                res.json(closedOrder);
                 return [3 /*break*/, 3];
             case 2:
-                err_4 = _a.sent();
-                res.status(400).json("".concat(err_4));
+                err_5 = _a.sent();
+                res.status(400).json("".concat(err_5));
                 return [3 /*break*/, 3];
             case 3: return [2 /*return*/];
         }
     });
 }); };
-var ordersRoutes = function (app) {
+var getOrderDetails = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var order, products, err_6;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 3, , 4]);
+                return [4 /*yield*/, store.checkOrderStatus(req.params.order_id)];
+            case 1:
+                order = _a.sent();
+                return [4 /*yield*/, store.getProducts(req.params.order_id)];
+            case 2:
+                products = _a.sent();
+                res.json({ order: order, products: products });
+                return [3 /*break*/, 4];
+            case 3:
+                err_6 = _a.sent();
+                res.status(400).json("".concat(err_6));
+                return [3 /*break*/, 4];
+            case 4: return [2 /*return*/];
+        }
+    });
+}); };
+var checkOrder = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var order, err_7;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 2, , 3]);
+                return [4 /*yield*/, store.checkOrderStatus(req.params.order_id)];
+            case 1:
+                order = _a.sent();
+                res.json(order);
+                return [3 /*break*/, 3];
+            case 2:
+                err_7 = _a.sent();
+                res.status(400).json("".concat(err_7));
+                return [3 /*break*/, 3];
+            case 3: return [2 /*return*/];
+        }
+    });
+}); };
+var ordersRouter = function (app) {
     app.get('/orders', index);
-    app.get('/orders/:id', get);
-    app.get('/orders/:user_id', authz_1.default, get);
+    app.get('/orders?user_id', authz_1.default, get);
     app.post('/orders', authz_1.default, create);
+    app.get('/orders/:order_id/products', getOrderDetails);
     app.post('/orders/:order_id/products', addProduct);
+    app.put('/orders/:order_id/close', closeOrder);
+    app.get('/orders/:order_id/check', checkOrder);
 };
-exports.default = ordersRoutes;
+exports.default = ordersRouter;
