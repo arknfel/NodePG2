@@ -1,14 +1,11 @@
-import { Order, OrderEntry, OrderProduct, OrderStore } from '../../src/models/order';
+import { Order, OrderStore } from '../../src/models/order';
 import client from '../../src/database';
-import { User, UserStore } from '../../src/models/user';
-import { Product, ProductStore } from '../../src/models/product';
+
 
 const orderStore = new OrderStore();
-const userStore = new UserStore();
-const productStore = new ProductStore
-
 
 fdescribe("Order Model", () => {
+
   beforeAll(async () => {
     // Reset table users before testing the order spec
     const conn = await client.connect();
@@ -26,12 +23,6 @@ fdescribe("Order Model", () => {
   const order: Order = {
     user_id: '1',
     status: 'active'
-  };
-
-  const user: User = {
-    firstname: "testUser",
-    lastname: "__",
-    password: "UshallnotPASS"
   };
 
   it('create() returns an Order', async () => {   
@@ -99,9 +90,24 @@ fdescribe("Order Model", () => {
     expect(result.status).toEqual('complete');
   });
 
-  it('addProduct() throws err', async () => {
+  it('addProduct() throws err since order status is complete', async () => {
     await expectAsync(orderStore.addProduct('1', '5', '1'))
-    // .toBeRejectedWithError('Unable to add product: Error: order 1 is already complete');
     .toBeRejectedWithError(/.+already complete/);
+  });
+
+  // closeOrder() throws an err if order is already complete
+  // if Order status is 'active', update it to 'complete'
+  it('expect order_id 1 status to be complete', async () => {
+    await expectAsync(orderStore.closeOrder('1'))
+    .toBeRejectedWithError(/.+already complete/);
+
+    // setting order to be active
+    const conn = await client.connect();
+    await conn.query("UPDATE orders SET status='active' \
+    WHERE id=1;");
+    conn.release();
+
+    const result = await orderStore.closeOrder('1');
+    expect(result.status).toEqual('complete');
   });
 });
