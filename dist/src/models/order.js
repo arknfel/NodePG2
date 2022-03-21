@@ -214,7 +214,7 @@ var OrderStore = /** @class */ (function () {
                     case 2:
                         order = _a.sent();
                         if (order.status == 'complete') {
-                            throw new Error("order ".concat(order_id, " is already closed"));
+                            throw new Error("order ".concat(order_id, " is already complete"));
                         }
                         sql = 'UPDATE orders SET status=\'complete\' \
       WHERE id=($1) RETURNING *;';

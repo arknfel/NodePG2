@@ -41,12 +41,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var order_1 = require("../../src/models/order");
 var database_1 = __importDefault(require("../../src/database"));
-var user_1 = require("../../src/models/user");
-var product_1 = require("../../src/models/product");
 var orderStore = new order_1.OrderStore();
-var userStore = new user_1.UserStore();
-var productStore = new product_1.ProductStore;
-fdescribe("Order Model", function () {
+describe("Order Model", function () {
     beforeAll(function () { return __awaiter(void 0, void 0, void 0, function () {
         var conn;
         return __generator(this, function (_a) {
@@ -74,11 +70,6 @@ fdescribe("Order Model", function () {
     var order = {
         user_id: '1',
         status: 'active'
-    };
-    var user = {
-        firstname: "testUser",
-        lastname: "__",
-        password: "UshallnotPASS"
     };
     it('create() returns an Order', function () { return __awaiter(void 0, void 0, void 0, function () {
         var result;
@@ -173,7 +164,7 @@ fdescribe("Order Model", function () {
             }
         });
     }); });
-    it('expect order_id 1 status to be complete', function () { return __awaiter(void 0, void 0, void 0, function () {
+    it('checkOrderStatus() expects order_id 1 status to be complete', function () { return __awaiter(void 0, void 0, void 0, function () {
         var result;
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -185,14 +176,39 @@ fdescribe("Order Model", function () {
             }
         });
     }); });
-    it('addProduct() throws err', function () { return __awaiter(void 0, void 0, void 0, function () {
+    it('addProduct() throws err since order status is complete', function () { return __awaiter(void 0, void 0, void 0, function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, expectAsync(orderStore.addProduct('1', '5', '1'))
-                        // .toBeRejectedWithError('Unable to add product: Error: order 1 is already complete');
                         .toBeRejectedWithError(/.+already complete/)];
                 case 1:
                     _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+    // closeOrder() throws an err if order is already complete
+    // if Order status is 'active', update it to 'complete'
+    it('closeOrder() throws err if order is complete, else, closes order', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var conn, result;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, expectAsync(orderStore.closeOrder('1'))
+                        .toBeRejectedWithError(/.+already complete/)];
+                case 1:
+                    _a.sent();
+                    return [4 /*yield*/, database_1.default.connect()];
+                case 2:
+                    conn = _a.sent();
+                    return [4 /*yield*/, conn.query("UPDATE orders SET status='active' \
+    WHERE id=1;")];
+                case 3:
+                    _a.sent();
+                    conn.release();
+                    return [4 /*yield*/, orderStore.closeOrder('1')];
+                case 4:
+                    result = _a.sent();
+                    expect(result.status).toEqual('complete');
                     return [2 /*return*/];
             }
         });

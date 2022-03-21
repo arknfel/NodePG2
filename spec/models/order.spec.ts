@@ -4,7 +4,7 @@ import client from '../../src/database';
 
 const orderStore = new OrderStore();
 
-fdescribe("Order Model", () => {
+describe("Order Model", () => {
 
   beforeAll(async () => {
     // Reset table users before testing the order spec
@@ -85,7 +85,7 @@ fdescribe("Order Model", () => {
     expect(result.length).toEqual(1);
   });
 
-  it('expect order_id 1 status to be complete', async () => {
+  it('checkOrderStatus() expects order_id 1 status to be complete', async () => {
     const result = await orderStore.checkOrderStatus('1');
     expect(result.status).toEqual('complete');
   });
@@ -97,7 +97,7 @@ fdescribe("Order Model", () => {
 
   // closeOrder() throws an err if order is already complete
   // if Order status is 'active', update it to 'complete'
-  it('expect order_id 1 status to be complete', async () => {
+  it('closeOrder() throws err if order is complete, else, closes order', async () => {
     await expectAsync(orderStore.closeOrder('1'))
     .toBeRejectedWithError(/.+already complete/);
 

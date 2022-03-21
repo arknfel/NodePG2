@@ -1,5 +1,4 @@
 import express from 'express';
-import booksRouter from './handlers/books';
 import ordersRouter from './handlers/orders';
 import productsRouter from './handlers/products';
 import usersRouter from './handlers/users';
@@ -12,7 +11,6 @@ const PORT: number = 3000;
 
 app.use(express.json());
 
-booksRouter(app);
 usersRouter(app);
 productsRouter(app);
 ordersRouter(app);

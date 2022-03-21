@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import { Product, ProductUpdates, ProductStore } from "../models/product";
+import { Product, ProductEntry, ProductStore } from "../models/product";
 import verifyAuthToken from '../middlewares/authz';
 
 

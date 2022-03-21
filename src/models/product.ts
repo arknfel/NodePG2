@@ -2,12 +2,12 @@ import client from "../database";
 
 
 export type Product = {
-  id?: number,
+  id?: number|string,
   name: string,
   price: string
 };
 
-export type ProductUpdates = {
+export type ProductEntry = {
   name?: string,
   price?: string
 };
@@ -57,7 +57,7 @@ export class ProductStore {
   };
 
 
-  async update(id: number, updates: ProductUpdates): Promise<Product> {
+  async update(id: number|string, updates: ProductEntry): Promise<Product> {
     try {
       const conn = await client.connect();
 
@@ -70,7 +70,7 @@ export class ProductStore {
         return `${pair[0]}=($${index+2})`;
       });
 
-      const sql = `INSERT INTO products ${queryParts} \
+      const sql = `UPDATE products SET ${queryParts} \
         WHERE id=($1) RETURNING *;`;
 
       const result = await conn.query(sql, [id, ...vals]);
@@ -82,21 +82,20 @@ export class ProductStore {
     }
   };
 
-  
-  async delete(id: string): Promise <Product> {
-    try {
-      const conn = await client.connect();
-      const sql = 'DELETE from products WHERE id=($1);';
-      const result = await conn.query(sql, [id]);
-      conn.release();
-      return result.rows[0];
+  // async delete(id: string): Promise <Product> {
+  //   try {
+  //     const conn = await client.connect();
+  //     const sql = 'DELETE from products WHERE id=($1);';
+  //     const result = await conn.query(sql, [id]);
+  //     conn.release();
+  //     return result.rows[0];
 
-    } catch (err) {
-      throw new Error(`unable to delete product: ${err}`);
-    }
-  };
+  //   } catch (err) {
+  //     throw new Error(`unable to delete product: ${err}`);
+  //   }
+  // };
 
-  // OPTIONAL
+  // DASHBOARD
   async hot(): Promise <(Product)[]> {
     try {
       const conn = await client.connect();

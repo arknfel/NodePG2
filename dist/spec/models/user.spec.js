@@ -42,7 +42,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var user_1 = require("../../src/models/user");
 var database_1 = __importDefault(require("../../src/database"));
 var store = new user_1.UserStore();
-fdescribe("User Model", function () { return __awaiter(void 0, void 0, void 0, function () {
+describe("User Model", function () { return __awaiter(void 0, void 0, void 0, function () {
     var user;
     return __generator(this, function (_a) {
         beforeAll(function () { return __awaiter(void 0, void 0, void 0, function () {

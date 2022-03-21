@@ -146,7 +146,7 @@ var ProductStore = /** @class */ (function () {
                             vals_1.push(pair[1]);
                             return "".concat(pair[0], "=($").concat(index + 2, ")");
                         });
-                        sql = "INSERT INTO products ".concat(queryParts, "         WHERE id=($1) RETURNING *;");
+                        sql = "UPDATE products SET ".concat(queryParts, "         WHERE id=($1) RETURNING *;");
                         return [4 /*yield*/, conn.query(sql, __spreadArray([id], vals_1, true))];
                     case 2:
                         result = _a.sent();
@@ -161,35 +161,21 @@ var ProductStore = /** @class */ (function () {
         });
     };
     ;
-    ProductStore.prototype.delete = function (id) {
-        return __awaiter(this, void 0, void 0, function () {
-            var conn, sql, result, err_5;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        _a.trys.push([0, 3, , 4]);
-                        return [4 /*yield*/, database_1.default.connect()];
-                    case 1:
-                        conn = _a.sent();
-                        sql = 'DELETE from products WHERE id=($1);';
-                        return [4 /*yield*/, conn.query(sql, [id])];
-                    case 2:
-                        result = _a.sent();
-                        conn.release();
-                        return [2 /*return*/, result.rows[0]];
-                    case 3:
-                        err_5 = _a.sent();
-                        throw new Error("unable to delete product: ".concat(err_5));
-                    case 4: return [2 /*return*/];
-                }
-            });
-        });
-    };
-    ;
-    // OPTIONAL
+    // async delete(id: string): Promise <Product> {
+    //   try {
+    //     const conn = await client.connect();
+    //     const sql = 'DELETE from products WHERE id=($1);';
+    //     const result = await conn.query(sql, [id]);
+    //     conn.release();
+    //     return result.rows[0];
+    //   } catch (err) {
+    //     throw new Error(`unable to delete product: ${err}`);
+    //   }
+    // };
+    // DASHBOARD
     ProductStore.prototype.hot = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var conn, sql, result, err_6;
+            var conn, sql, result, err_5;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -206,8 +192,8 @@ var ProductStore = /** @class */ (function () {
                         conn.release();
                         return [2 /*return*/, result.rows];
                     case 3:
-                        err_6 = _a.sent();
-                        throw new Error("unable to generate trends report: ".concat(err_6));
+                        err_5 = _a.sent();
+                        throw new Error("unable to generate trends report: ".concat(err_5));
                     case 4: return [2 /*return*/];
                 }
             });

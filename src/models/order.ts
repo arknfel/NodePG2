@@ -159,7 +159,7 @@ export class OrderStore {
       let order = await this.checkOrderStatus(order_id, conn);
 
       if (order.status == 'complete') {
-        throw new Error(`order ${order_id} is already closed`);
+        throw new Error(`order ${order_id} is already complete`);
       }
 
       const sql = 'UPDATE orders SET status=\'complete\' \

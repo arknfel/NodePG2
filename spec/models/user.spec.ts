@@ -4,7 +4,7 @@ import client from '../../src/database';
 const store = new UserStore();
 
 
-fdescribe("User Model", async () => {
+describe("User Model", async () => {
   beforeAll( async () => {
     const conn = await client.connect();
     await conn.query('TRUNCATE users RESTART IDENTITY CASCADE;');
