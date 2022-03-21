@@ -4,41 +4,58 @@ import { connAvail } from "./utils";
 
 
 export type Order = {
-  id?: string,
-  user_id: string|number,
-  status: string
+  id?: number|string,
+  user_id: number|string,
+  status?: string
 };
 
 export type OrderEntry = {
-  user_id?: string|number,
+  id?: number|string
+  user_id?: number|string,
   status?: string
 };
 
 export type OrderProduct = {
-  quantity: string,
-  order_id: string,
-  product_id: string  
+  quantity: number|string,
+  order_id: number|string,
+  product_id: number|string  
 };
 
 
 export class OrderStore {
-  async index(): Promise<(Order)[]> {
+
+  // async index(): Promise<(Order)[]> {
+  //   try {
+  //     const sql = 'SELECT * from orders';
+  //     const conn = await client.connect();
+  //     const result = await conn.query(sql);
+  //     conn.release();
+  //     return result.rows;
+  //   } catch (err) {
+  //     throw new Error(`unable to get orders:\n${err}`);
+  //   }
+  // };
+
+
+  async getOrder(order_id: number|string, user_id: number|string): Promise<Order> {
     try {
-      const sql = 'SELECT * from orders';
+      const sql = `SELECT * from orders WHERE id=($1) \
+        AND user_id=($2);`;
       const conn = await client.connect();
-      const result = await conn.query(sql);
+      const result = await conn.query(sql, [order_id, user_id]);
       conn.release();
-      return result.rows;
+      return result.rows[0];
+
     } catch (err) {
-      throw new Error(`unable to get orders:\n${err}`);
+      throw new Error(`unable to get order:\n${err}`);
     }
   };
 
 
-  async get(user_id: string): Promise<(Order)[]> {
+  async completedOrders(user_id: number|string): Promise<(Order)[]> {
     try {
-
-      const sql = 'SELECT * from orders WHERE user_id=($1)';
+      const sql = `SELECT * from orders WHERE user_id=($1) \
+        AND status='complete';`;
       const conn = await client.connect();
       const result = await conn.query(sql, [user_id]);
       conn.release();
@@ -50,15 +67,25 @@ export class OrderStore {
   };
 
 
-  async create(order: OrderEntry): Promise<Order> {
+  async create(order: Order): Promise<OrderEntry> {
     try {
       const sql = 'INSERT INTO orders (user_id, status) \
-        VALUES ($1, \'active\') RETURNING *;';
+        VALUES ($1, $2) RETURNING *;';
 
       const conn = await client.connect();
-      const result = await conn.query(sql, [order.user_id]);
+      const result = await conn.query(sql, [order.user_id, order.status]);
       conn.release();
+      // const createdOrder: Order = {
+      //   id: result.rows[0].id,
+      //   user_id: result.rows[0].user_id,
+      //   status: result.rows[0].status
+      // } 
       return result.rows[0];
+      // return {
+      //   id: result.rows[0].id,
+      //   user_id: result.rows[0].user_id,
+      //   status: result.rows[0].status
+      // };
 
     } catch (err) {
       throw new Error(`unable to create order:\n${err}`);
@@ -67,7 +94,7 @@ export class OrderStore {
 
 
   async checkOrderStatus(
-    order_id: string,
+    order_id: string|number,
     currentConn?: PoolClient
   ): Promise<Order> {
     try {
@@ -77,7 +104,8 @@ export class OrderStore {
       const conn = await connAvail(currentConn, client);
 
       const result = await conn.query(sql, [order_id]);
-      if (!currentConn) { conn.release }
+      if (!currentConn) { conn.release(); }
+      // conn.release();
       return result.rows[0];
 
     } catch (err) {
@@ -87,10 +115,10 @@ export class OrderStore {
 
 
   async addProduct(
-    order_id: string,
-    quantity: string,
-    product_id: string
-  ): Promise<Order> {
+    order_id: number|string,
+    quantity: number|string,
+    product_id: number|string
+  ): Promise<OrderProduct> {
     try {
       const sql = 'INSERT INTO order_products (\
         quantity, order_id, product_id) VALUES \
@@ -106,14 +134,10 @@ export class OrderStore {
 
       if (order.status == 'complete') {
         conn.release();
-        throw new Error(`order ${order_id} is already closed`);
+        throw new Error(`order ${order_id} is already complete`);
       }
 
-      const result = await conn.query(sql, [
-        quantity,
-        order_id,
-        product_id
-      ]);
+      const result = await conn.query(sql, [quantity, order_id, product_id]);
       conn.release();
       return result.rows[0];
 
@@ -123,7 +147,7 @@ export class OrderStore {
   };
 
 
-  async closeOrder(order_id: string, currentConn?: PoolClient) {
+  async closeOrder(order_id: string|number, currentConn?: PoolClient) {
     try {
 
       // Initiate a stand-alone db conn
@@ -132,7 +156,7 @@ export class OrderStore {
 
       // check if order is alread closed/complete
       // before commiting an update 
-      const order = await this.checkOrderStatus(order_id, conn);
+      let order = await this.checkOrderStatus(order_id, conn);
 
       if (order.status == 'complete') {
         throw new Error(`order ${order_id} is already closed`);
@@ -142,6 +166,7 @@ export class OrderStore {
       WHERE id=($1) RETURNING *;';
 
       const result = await conn.query(sql, [order_id]);
+      conn.release();
       return result.rows[0];
 
     } catch (err) {
@@ -149,7 +174,7 @@ export class OrderStore {
     }
   };
 
-  async getProducts(order_id: string, currentConn?: PoolClient) {
+  async getProducts(order_id: string|number, currentConn?: PoolClient) {
     const sql = 'SELECT p.name as name, SUM(op.quantity) AS quantity \
       , p.price AS price, SUM(p.price*op.quantity) AS cost \
       FROM products p JOIN order_products op ON p.id=op.product_id \
@@ -161,6 +186,7 @@ export class OrderStore {
       // if none are available.
       const conn = await connAvail(currentConn, client);
       const result = await conn.query(sql, [order_id])
+      conn.release();
       return result.rows;
  
     } catch (err) {

@@ -35,59 +35,166 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 var order_1 = require("../../src/models/order");
-var process_1 = require("process");
-var store = new order_1.OrderStore();
-xdescribe("Order Model", function () {
+var database_1 = __importDefault(require("../../src/database"));
+var user_1 = require("../../src/models/user");
+var product_1 = require("../../src/models/product");
+var orderStore = new order_1.OrderStore();
+var userStore = new user_1.UserStore();
+var productStore = new product_1.ProductStore;
+fdescribe("Order Model", function () {
+    beforeAll(function () { return __awaiter(void 0, void 0, void 0, function () {
+        var conn;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, database_1.default.connect()];
+                case 1:
+                    conn = _a.sent();
+                    return [4 /*yield*/, conn.query("TRUNCATE users RESTART IDENTITY CASCADE;")];
+                case 2:
+                    _a.sent();
+                    // creating a user and a product to satisfy foriegn-key constrains 
+                    return [4 /*yield*/, conn.query("INSERT INTO users (firstname, lastname, password) \
+      VALUES ('testUser', 'lastname', 'UshallnotPASS');")];
+                case 3:
+                    // creating a user and a product to satisfy foriegn-key constrains 
+                    _a.sent();
+                    return [4 /*yield*/, conn.query("INSERT INTO products (name, price) \
+      VALUES ('testProduct01', 42.42);").then(function () { return conn.release(); })];
+                case 4:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    }); });
     var order = {
-        user_id: 1
+        user_id: '1',
+        status: 'active'
     };
-    it('index() returns []', function () {
-        (0, process_1.nextTick)(function () { return __awaiter(void 0, void 0, void 0, function () {
-            var result;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, store.index()];
-                    case 1:
-                        result = _a.sent();
-                        expect(result).toEqual([]);
-                        return [2 /*return*/];
-                }
-            });
-        }); });
-    });
-    it('create() returns a User', function (done) {
-        (0, process_1.nextTick)(function () { return __awaiter(void 0, void 0, void 0, function () {
-            var result;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, store.create(order)];
-                    case 1:
-                        result = _a.sent();
-                        expect(result).toEqual({
-                            id: '1',
-                            user_id: '1',
-                            status: 'active',
-                        });
-                        done();
-                        return [2 /*return*/];
-                }
-            });
-        }); });
-    });
-    it('get() returns a user by id', function () {
-        (0, process_1.nextTick)(function () { return __awaiter(void 0, void 0, void 0, function () {
-            var result;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, store.get('1')];
-                    case 1:
-                        result = _a.sent();
-                        expect(result).toEqual([]);
-                        return [2 /*return*/];
-                }
-            });
-        }); });
-    });
+    var user = {
+        firstname: "testUser",
+        lastname: "__",
+        password: "UshallnotPASS"
+    };
+    it('create() returns an Order', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var result;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, orderStore.create(order)];
+                case 1:
+                    result = _a.sent();
+                    expect(result).toEqual({
+                        id: 1,
+                        user_id: '1',
+                        status: 'active'
+                    });
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+    it('getOrder() returns an Order by user_id, order_id', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var result;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, orderStore.getOrder('1', '1')];
+                case 1:
+                    result = _a.sent();
+                    expect({
+                        id: result.id,
+                        user_id: result.user_id,
+                        status: result.status
+                    }).toEqual({
+                        id: 1,
+                        user_id: '1',
+                        status: 'active'
+                    });
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+    it('checkOrderStatus() returns Order by order_id', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var result;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, orderStore.checkOrderStatus('1')];
+                case 1:
+                    result = _a.sent();
+                    expect(result).toEqual({
+                        id: 1,
+                        user_id: '1',
+                        status: 'active'
+                    });
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+    // // Checks for Order status
+    // // addProduct() adds an order_products entry if Order is active
+    // // throws error if Order was complete while adding a product.
+    it('addProduct() returns Order', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var result;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, orderStore.addProduct('1', '5', '1')];
+                case 1:
+                    result = _a.sent();
+                    expect(result).toEqual({
+                        order_id: '1',
+                        quantity: 5,
+                        product_id: '1'
+                    });
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+    it('completedOrders() returns all completed Orders by user_id', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var conn, result;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, database_1.default.connect()];
+                case 1:
+                    conn = _a.sent();
+                    // setting order to be complete
+                    return [4 /*yield*/, conn.query("UPDATE orders SET status='complete' \
+      WHERE id=1;")];
+                case 2:
+                    // setting order to be complete
+                    _a.sent();
+                    conn.release();
+                    return [4 /*yield*/, orderStore.completedOrders('1')];
+                case 3:
+                    result = _a.sent();
+                    expect(result.length).toEqual(1);
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+    it('expect order_id 1 status to be complete', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var result;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, orderStore.checkOrderStatus('1')];
+                case 1:
+                    result = _a.sent();
+                    expect(result.status).toEqual('complete');
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+    it('addProduct() throws err', function () { return __awaiter(void 0, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, expectAsync(orderStore.addProduct('1', '5', '1'))
+                        // .toBeRejectedWithError('Unable to add product: Error: order 1 is already complete');
+                        .toBeRejectedWithError(/.+already complete/)];
+                case 1:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    }); });
 });

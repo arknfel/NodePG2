@@ -45,6 +45,21 @@ var store = new user_1.UserStore();
 fdescribe("User Model", function () { return __awaiter(void 0, void 0, void 0, function () {
     var user;
     return __generator(this, function (_a) {
+        beforeAll(function () { return __awaiter(void 0, void 0, void 0, function () {
+            var conn;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, database_1.default.connect()];
+                    case 1:
+                        conn = _a.sent();
+                        return [4 /*yield*/, conn.query('TRUNCATE users RESTART IDENTITY CASCADE;')];
+                    case 2:
+                        _a.sent();
+                        conn.release();
+                        return [2 /*return*/];
+                }
+            });
+        }); });
         user = {
             firstname: "testUser",
             lastname: "lastname",

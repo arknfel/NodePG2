@@ -42,32 +42,35 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var authz_1 = __importDefault(require("../middlewares/authz"));
 var order_1 = require("../models/order");
 var store = new order_1.OrderStore();
-var index = function (_req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var products, err_1;
+var getOrder = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var order_id, user_id, order, err_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 _a.trys.push([0, 2, , 3]);
-                return [4 /*yield*/, store.index()];
+                order_id = req.params.order_id;
+                user_id = req.params.user_id;
+                return [4 /*yield*/, store.getOrder(order_id, user_id)];
             case 1:
-                products = _a.sent();
-                res.json(products);
+                order = _a.sent();
+                res.json(order);
                 return [3 /*break*/, 3];
             case 2:
                 err_1 = _a.sent();
-                res.status(400).json('err');
+                res.status(400).json("".concat(err_1));
                 return [3 /*break*/, 3];
             case 3: return [2 /*return*/];
         }
     });
 }); };
-var get = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var order, err_2;
+var completedOrders = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var user_id, order, err_2;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 _a.trys.push([0, 2, , 3]);
-                return [4 /*yield*/, store.get(req.params.user_id)];
+                user_id = req.params.user_id;
+                return [4 /*yield*/, store.completedOrders(user_id)];
             case 1:
                 order = _a.sent();
                 res.json(order);
@@ -194,8 +197,9 @@ var checkOrder = function (req, res) { return __awaiter(void 0, void 0, void 0, 
     });
 }); };
 var ordersRouter = function (app) {
-    app.get('/orders', index);
-    app.get('/orders?user_id', authz_1.default, get);
+    // app.get('/orders', verifyAuthToken, index);
+    app.get('/users/:user_id/orders/:order_id', authz_1.default, getOrder);
+    app.get('/users/:user_id/orders/', authz_1.default, completedOrders);
     app.post('/orders', authz_1.default, create);
     app.get('/orders/:order_id/products', getOrderDetails);
     app.post('/orders/:order_id/products', addProduct);
@@ -203,3 +207,18 @@ var ordersRouter = function (app) {
     app.get('/orders/:order_id/check', checkOrder);
 };
 exports.default = ordersRouter;
+// const user_id = req.params.user_id;
+// let status = req.query.status as string;
+// if (
+//   !req.params.user_id
+//   || isNaN(parseInt(user_id))
+//   ) {
+//     res.status(404).json(`missing user_id`);
+// }
+// if (
+//   !status
+//   || !((status as string) === 'active')
+//   || !((status as string) === 'complete')
+//   ) {
+//     status = 'active'
+// }

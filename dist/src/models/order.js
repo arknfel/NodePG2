@@ -45,39 +45,50 @@ var utils_1 = require("./utils");
 var OrderStore = /** @class */ (function () {
     function OrderStore() {
     }
-    OrderStore.prototype.index = function () {
+    // async index(): Promise<(Order)[]> {
+    //   try {
+    //     const sql = 'SELECT * from orders';
+    //     const conn = await client.connect();
+    //     const result = await conn.query(sql);
+    //     conn.release();
+    //     return result.rows;
+    //   } catch (err) {
+    //     throw new Error(`unable to get orders:\n${err}`);
+    //   }
+    // };
+    OrderStore.prototype.getOrder = function (order_id, user_id) {
         return __awaiter(this, void 0, void 0, function () {
             var sql, conn, result, err_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 3, , 4]);
-                        sql = 'SELECT * from orders';
+                        sql = "SELECT * from orders WHERE id=($1)         AND user_id=($2);";
                         return [4 /*yield*/, database_1.default.connect()];
                     case 1:
                         conn = _a.sent();
-                        return [4 /*yield*/, conn.query(sql)];
+                        return [4 /*yield*/, conn.query(sql, [order_id, user_id])];
                     case 2:
                         result = _a.sent();
                         conn.release();
-                        return [2 /*return*/, result.rows];
+                        return [2 /*return*/, result.rows[0]];
                     case 3:
                         err_1 = _a.sent();
-                        throw new Error("unable to get orders:\n".concat(err_1));
+                        throw new Error("unable to get order:\n".concat(err_1));
                     case 4: return [2 /*return*/];
                 }
             });
         });
     };
     ;
-    OrderStore.prototype.get = function (user_id) {
+    OrderStore.prototype.completedOrders = function (user_id) {
         return __awaiter(this, void 0, void 0, function () {
             var sql, conn, result, err_2;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 3, , 4]);
-                        sql = 'SELECT * from orders WHERE user_id=($1)';
+                        sql = "SELECT * from orders WHERE user_id=($1)         AND status='complete';";
                         return [4 /*yield*/, database_1.default.connect()];
                     case 1:
                         conn = _a.sent();
@@ -103,14 +114,19 @@ var OrderStore = /** @class */ (function () {
                     case 0:
                         _a.trys.push([0, 3, , 4]);
                         sql = 'INSERT INTO orders (user_id, status) \
-        VALUES ($1, \'active\') RETURNING *;';
+        VALUES ($1, $2) RETURNING *;';
                         return [4 /*yield*/, database_1.default.connect()];
                     case 1:
                         conn = _a.sent();
-                        return [4 /*yield*/, conn.query(sql, [order.user_id])];
+                        return [4 /*yield*/, conn.query(sql, [order.user_id, order.status])];
                     case 2:
                         result = _a.sent();
                         conn.release();
+                        // const createdOrder: Order = {
+                        //   id: result.rows[0].id,
+                        //   user_id: result.rows[0].user_id,
+                        //   status: result.rows[0].status
+                        // } 
                         return [2 /*return*/, result.rows[0]];
                     case 3:
                         err_3 = _a.sent();
@@ -137,8 +153,9 @@ var OrderStore = /** @class */ (function () {
                     case 2:
                         result = _a.sent();
                         if (!currentConn) {
-                            conn.release;
+                            conn.release();
                         }
+                        // conn.release();
                         return [2 /*return*/, result.rows[0]];
                     case 3:
                         err_4 = _a.sent();
@@ -167,13 +184,9 @@ var OrderStore = /** @class */ (function () {
                         order = _a.sent();
                         if (order.status == 'complete') {
                             conn.release();
-                            throw new Error("order ".concat(order_id, " is already closed"));
+                            throw new Error("order ".concat(order_id, " is already complete"));
                         }
-                        return [4 /*yield*/, conn.query(sql, [
-                                quantity,
-                                order_id,
-                                product_id
-                            ])];
+                        return [4 /*yield*/, conn.query(sql, [quantity, order_id, product_id])];
                     case 3:
                         result = _a.sent();
                         conn.release();
@@ -208,6 +221,7 @@ var OrderStore = /** @class */ (function () {
                         return [4 /*yield*/, conn.query(sql, [order_id])];
                     case 3:
                         result = _a.sent();
+                        conn.release();
                         return [2 /*return*/, result.rows[0]];
                     case 4:
                         err_6 = _a.sent();
@@ -238,6 +252,7 @@ var OrderStore = /** @class */ (function () {
                         return [4 /*yield*/, conn.query(sql, [order_id])];
                     case 3:
                         result = _a.sent();
+                        conn.release();
                         return [2 /*return*/, result.rows];
                     case 4:
                         err_7 = _a.sent();

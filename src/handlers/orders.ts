@@ -3,24 +3,32 @@ import verifyAuthToken from '../middlewares/authz';
 import { Order, OrderProduct, OrderStore } from '../models/order';
 
 import client from '../database';
+import { isBigInt64Array } from 'util/types';
 
 
 const store = new OrderStore();
 
 
-const index = async (_req: Request, res: Response) => {
+const getOrder = async (req: Request, res: Response) => {
   try {
-    const products = await store.index();
-    res.json(products);
+    const order_id = req.params.order_id;
+    const user_id = req.params.user_id;
+
+    const order = await store.getOrder(
+      order_id,
+      user_id
+    );
+    res.json(order);
   } catch (err) {
-    res.status(400).json('err');
+    res.status(400).json(`${err}`); 
   }
 };
 
 
-const get = async (req: Request, res: Response) => {
+const completedOrders = async (req: Request, res: Response) => {
   try {
-    const order = await store.get(req.params.user_id);
+    const user_id = req.params.user_id;
+    const order = await store.completedOrders(user_id);
     res.json(order);
   } catch (err) {
     res.status(400).json(`${err}`);
@@ -102,9 +110,13 @@ const checkOrder = async (req: Request, res: Response) => {
 }
 
 
+
+
+
 const ordersRouter = (app: express.Application) => {
-  app.get('/orders', index);
-  app.get('/orders?user_id', verifyAuthToken, get);
+  // app.get('/orders', verifyAuthToken, index);
+  app.get('/users/:user_id/orders/:order_id',verifyAuthToken, getOrder);
+  app.get('/users/:user_id/orders/',verifyAuthToken, completedOrders);
   app.post('/orders', verifyAuthToken, create);
   app.get('/orders/:order_id/products', getOrderDetails);
   app.post('/orders/:order_id/products', addProduct);
@@ -114,3 +126,22 @@ const ordersRouter = (app: express.Application) => {
 
 
 export default ordersRouter;
+
+
+
+// const user_id = req.params.user_id;
+// let status = req.query.status as string;
+
+// if (
+//   !req.params.user_id
+//   || isNaN(parseInt(user_id))
+//   ) {
+//     res.status(404).json(`missing user_id`);
+// }
+// if (
+//   !status
+//   || !((status as string) === 'active')
+//   || !((status as string) === 'complete')
+//   ) {
+//     status = 'active'
+// }
