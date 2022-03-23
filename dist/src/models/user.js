@@ -58,7 +58,7 @@ var UserStore = /** @class */ (function () {
                         return [4 /*yield*/, database_1.default.connect()];
                     case 1:
                         conn = _a.sent();
-                        sql = 'SELECT * from users;';
+                        sql = 'SELECT id, firstname, lastname from users;';
                         return [4 /*yield*/, conn.query(sql)];
                     case 2:
                         result = _a.sent();
@@ -96,7 +96,7 @@ var UserStore = /** @class */ (function () {
                             }];
                     case 3:
                         err_2 = _a.sent();
-                        throw err_2;
+                        throw "unable to get user: ".concat(err_2);
                     case 4: return [2 /*return*/];
                 }
             });

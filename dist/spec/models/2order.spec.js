@@ -213,4 +213,17 @@ describe("Order Model", function () {
             }
         });
     }); });
+    it('getProducts()', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var result;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, orderStore.getProducts(1)];
+                case 1:
+                    result = _a.sent();
+                    console.log(result);
+                    expect(result.length).toBeGreaterThan(0);
+                    return [2 /*return*/];
+            }
+        });
+    }); });
 });

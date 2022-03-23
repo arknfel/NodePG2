@@ -26,7 +26,7 @@ export class UserStore {
   async index(): Promise <(User)[]> {
     try {
       const conn = await client.connect();
-      const sql = 'SELECT * from users;';
+      const sql = 'SELECT id, firstname, lastname from users;';
       const result = await conn.query(sql);
       conn.release();
       return result.rows;
@@ -48,7 +48,7 @@ export class UserStore {
         lastname: user.lastname
       }
     } catch (err) {
-      throw err;
+      throw `unable to get user: ${err}`;
     }
   }
 

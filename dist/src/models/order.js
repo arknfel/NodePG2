@@ -45,20 +45,34 @@ var utils_1 = require("./utils");
 var OrderStore = /** @class */ (function () {
     function OrderStore() {
     }
-    // async index(): Promise<(Order)[]> {
-    //   try {
-    //     const sql = 'SELECT * from orders';
-    //     const conn = await client.connect();
-    //     const result = await conn.query(sql);
-    //     conn.release();
-    //     return result.rows;
-    //   } catch (err) {
-    //     throw new Error(`unable to get orders:\n${err}`);
-    //   }
-    // };
-    OrderStore.prototype.getOrder = function (order_id, user_id) {
+    OrderStore.prototype.index = function () {
         return __awaiter(this, void 0, void 0, function () {
             var sql, conn, result, err_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 3, , 4]);
+                        sql = 'SELECT * from orders';
+                        return [4 /*yield*/, database_1.default.connect()];
+                    case 1:
+                        conn = _a.sent();
+                        return [4 /*yield*/, conn.query(sql)];
+                    case 2:
+                        result = _a.sent();
+                        conn.release();
+                        return [2 /*return*/, result.rows];
+                    case 3:
+                        err_1 = _a.sent();
+                        throw new Error("unable to get orders:\n".concat(err_1));
+                    case 4: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    ;
+    OrderStore.prototype.getOrder = function (order_id, user_id) {
+        return __awaiter(this, void 0, void 0, function () {
+            var sql, conn, result, err_2;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -73,8 +87,8 @@ var OrderStore = /** @class */ (function () {
                         conn.release();
                         return [2 /*return*/, result.rows[0]];
                     case 3:
-                        err_1 = _a.sent();
-                        throw new Error("unable to get order:\n".concat(err_1));
+                        err_2 = _a.sent();
+                        throw new Error("unable to get order:\n".concat(err_2));
                     case 4: return [2 /*return*/];
                 }
             });
@@ -83,7 +97,7 @@ var OrderStore = /** @class */ (function () {
     ;
     OrderStore.prototype.completedOrders = function (user_id) {
         return __awaiter(this, void 0, void 0, function () {
-            var sql, conn, result, err_2;
+            var sql, conn, result, err_3;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -98,8 +112,8 @@ var OrderStore = /** @class */ (function () {
                         conn.release();
                         return [2 /*return*/, result.rows];
                     case 3:
-                        err_2 = _a.sent();
-                        throw new Error("unable to get order:\n".concat(err_2));
+                        err_3 = _a.sent();
+                        throw new Error("unable to get order:\n".concat(err_3));
                     case 4: return [2 /*return*/];
                 }
             });
@@ -108,7 +122,7 @@ var OrderStore = /** @class */ (function () {
     ;
     OrderStore.prototype.create = function (order) {
         return __awaiter(this, void 0, void 0, function () {
-            var sql, conn, result, err_3;
+            var sql, conn, result, err_4;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -122,15 +136,10 @@ var OrderStore = /** @class */ (function () {
                     case 2:
                         result = _a.sent();
                         conn.release();
-                        // const createdOrder: Order = {
-                        //   id: result.rows[0].id,
-                        //   user_id: result.rows[0].user_id,
-                        //   status: result.rows[0].status
-                        // } 
                         return [2 /*return*/, result.rows[0]];
                     case 3:
-                        err_3 = _a.sent();
-                        throw new Error("unable to create order:\n".concat(err_3));
+                        err_4 = _a.sent();
+                        throw new Error("unable to create order:\n".concat(err_4));
                     case 4: return [2 /*return*/];
                 }
             });
@@ -139,7 +148,7 @@ var OrderStore = /** @class */ (function () {
     ;
     OrderStore.prototype.checkOrderStatus = function (order_id, currentConn) {
         return __awaiter(this, void 0, void 0, function () {
-            var sql, conn, result, err_4;
+            var sql, conn, result, err_5;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -158,8 +167,8 @@ var OrderStore = /** @class */ (function () {
                         // conn.release();
                         return [2 /*return*/, result.rows[0]];
                     case 3:
-                        err_4 = _a.sent();
-                        throw new Error("Unable to check order status:\n".concat(err_4));
+                        err_5 = _a.sent();
+                        throw new Error("Unable to check order status:\n".concat(err_5));
                     case 4: return [2 /*return*/];
                 }
             });
@@ -168,7 +177,7 @@ var OrderStore = /** @class */ (function () {
     ;
     OrderStore.prototype.addProduct = function (order_id, quantity, product_id) {
         return __awaiter(this, void 0, void 0, function () {
-            var sql, conn, order, result, err_5;
+            var sql, conn, order, result, err_6;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -192,8 +201,8 @@ var OrderStore = /** @class */ (function () {
                         conn.release();
                         return [2 /*return*/, result.rows[0]];
                     case 4:
-                        err_5 = _a.sent();
-                        throw new Error("Unable to add product:\n\t".concat(err_5));
+                        err_6 = _a.sent();
+                        throw new Error("Unable to add product:\n\t".concat(err_6));
                     case 5: return [2 /*return*/];
                 }
             });
@@ -202,7 +211,7 @@ var OrderStore = /** @class */ (function () {
     ;
     OrderStore.prototype.closeOrder = function (order_id, currentConn) {
         return __awaiter(this, void 0, void 0, function () {
-            var conn, order, sql, result, err_6;
+            var conn, order, sql, result, err_7;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -224,8 +233,8 @@ var OrderStore = /** @class */ (function () {
                         conn.release();
                         return [2 /*return*/, result.rows[0]];
                     case 4:
-                        err_6 = _a.sent();
-                        throw new Error("Unable to close order ".concat(order_id, ": \n\t").concat(err_6));
+                        err_7 = _a.sent();
+                        throw new Error("Unable to close order ".concat(order_id, ": \n\t").concat(err_7));
                     case 5: return [2 /*return*/];
                 }
             });
@@ -234,7 +243,7 @@ var OrderStore = /** @class */ (function () {
     ;
     OrderStore.prototype.getProducts = function (order_id, currentConn) {
         return __awaiter(this, void 0, void 0, function () {
-            var sql, conn, result, err_7;
+            var sql, conn, result, err_8;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -255,8 +264,8 @@ var OrderStore = /** @class */ (function () {
                         conn.release();
                         return [2 /*return*/, result.rows];
                     case 4:
-                        err_7 = _a.sent();
-                        throw new Error("Unable to get products of ".concat(order_id, ": \n\t").concat(err_7));
+                        err_8 = _a.sent();
+                        throw new Error("Unable to get products of ".concat(order_id, ": \n\t").concat(err_8));
                     case 5: return [2 /*return*/];
                 }
             });

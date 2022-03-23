@@ -24,17 +24,17 @@ export type OrderProduct = {
 
 export class OrderStore {
 
-  // async index(): Promise<(Order)[]> {
-  //   try {
-  //     const sql = 'SELECT * from orders';
-  //     const conn = await client.connect();
-  //     const result = await conn.query(sql);
-  //     conn.release();
-  //     return result.rows;
-  //   } catch (err) {
-  //     throw new Error(`unable to get orders:\n${err}`);
-  //   }
-  // };
+  async index(): Promise<(Order)[]> {
+    try {
+      const sql = 'SELECT * from orders';
+      const conn = await client.connect();
+      const result = await conn.query(sql);
+      conn.release();
+      return result.rows;
+    } catch (err) {
+      throw new Error(`unable to get orders:\n${err}`);
+    }
+  };
 
 
   async getOrder(order_id: number|string, user_id: number|string): Promise<Order> {
@@ -75,17 +75,7 @@ export class OrderStore {
       const conn = await client.connect();
       const result = await conn.query(sql, [order.user_id, order.status]);
       conn.release();
-      // const createdOrder: Order = {
-      //   id: result.rows[0].id,
-      //   user_id: result.rows[0].user_id,
-      //   status: result.rows[0].status
-      // } 
       return result.rows[0];
-      // return {
-      //   id: result.rows[0].id,
-      //   user_id: result.rows[0].user_id,
-      //   status: result.rows[0].status
-      // };
 
     } catch (err) {
       throw new Error(`unable to create order:\n${err}`);
@@ -174,7 +164,9 @@ export class OrderStore {
     }
   };
 
-  async getProducts(order_id: string|number, currentConn?: PoolClient) {
+  async getProducts(
+    order_id: string|number, currentConn?: PoolClient
+  ): Promise<({name:string, quantity: string, price: string, const: string})[]> {
     const sql = 'SELECT p.name as name, SUM(op.quantity) AS quantity \
       , p.price AS price, SUM(p.price*op.quantity) AS cost \
       FROM products p JOIN order_products op ON p.id=op.product_id \

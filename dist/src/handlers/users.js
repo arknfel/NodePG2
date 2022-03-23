@@ -43,7 +43,7 @@ var user_1 = require("../models/user");
 var jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 var authz_1 = __importDefault(require("../middlewares/authz"));
 var store = new user_1.UserStore();
-var index = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+var index = function (_req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var users, err_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -68,7 +68,7 @@ var get = function (req, res) { return __awaiter(void 0, void 0, void 0, functio
             case 0:
                 _a.trys.push([0, 2, , 3]);
                 if (!req.params.user_id) {
-                    return [2 /*return*/, res.status(401).json('Missing field firstname.')];
+                    return [2 /*return*/, res.status(401).json('Missing user_id.')];
                 }
                 return [4 /*yield*/, store.get(req.params.user_id)];
             case 1:
@@ -77,7 +77,7 @@ var get = function (req, res) { return __awaiter(void 0, void 0, void 0, functio
                 return [3 /*break*/, 3];
             case 2:
                 err_2 = _a.sent();
-                return [2 /*return*/, res.status(400).json('Unable to get user.')];
+                return [2 /*return*/, res.status(400).json(err_2)];
             case 3: return [2 /*return*/];
         }
     });

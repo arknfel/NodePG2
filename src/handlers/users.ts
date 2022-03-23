@@ -1,12 +1,12 @@
 import express, { Request, response, Response } from 'express';
-import { User, UserStore } from '../models/user';
+import { UserStore } from '../models/user';
 import jwt, {Secret} from 'jsonwebtoken';
 import verifyAuthToken from '../middlewares/authz';
 
 
 const store = new UserStore();
 
-const index = async (req: Request, res: Response) => {
+const index = async (_req: Request, res: Response) => {
   try {
     const users = await store.index();
     res.json(users);
@@ -19,12 +19,12 @@ const index = async (req: Request, res: Response) => {
 const get = async (req: Request, res: Response) => {
   try {
     if (!req.params.user_id) {
-      return res.status(401).json('Missing field firstname.');
+      return res.status(401).json('Missing user_id.');
     }
     const user = await store.get(req.params.user_id);
     res.json(user);
   } catch (err) {
-    return res.status(400).json('Unable to get user.');
+    return res.status(400).json(err);
   }
 };
 
@@ -48,7 +48,7 @@ const create = async (req: Request, res: Response) => {
     if (!newUser) { return res.status(401).json('User exists.') }
     
     const secret = (process.env.TOKEN_SECRET as unknown) as Secret;
-    var token = jwt.sign({ user: newUser }, secret);
+    const token = jwt.sign({ user: newUser }, secret);
     res.setHeader('Authorization', `Bearer ${token}`);
     res.json('token generated');
   

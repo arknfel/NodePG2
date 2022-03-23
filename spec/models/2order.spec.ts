@@ -110,4 +110,12 @@ describe("Order Model", () => {
     const result = await orderStore.closeOrder('1');
     expect(result.status).toEqual('complete');
   });
+
+
+  it('getProducts()', async () => {
+    const result = await orderStore.getProducts(1);
+    console.log(result);
+    expect(result.length).toBeGreaterThan(0);
+  });
+
 });

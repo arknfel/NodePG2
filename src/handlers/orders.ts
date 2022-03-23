@@ -2,12 +2,17 @@ import express, { Request, Response } from 'express';
 import verifyAuthToken from '../middlewares/authz';
 import { Order, OrderProduct, OrderStore } from '../models/order';
 
-import client from '../database';
-import { isBigInt64Array } from 'util/types';
-
 
 const store = new OrderStore();
 
+const index = async(req: Request, res: Response) => {
+  try {
+    const result = await store.index();
+    res.json(result);
+  } catch (err) {
+    res.status(400).json(err);
+  }
+}
 
 const getOrder = async (req: Request, res: Response) => {
   try {
@@ -24,7 +29,6 @@ const getOrder = async (req: Request, res: Response) => {
   }
 };
 
-
 const completedOrders = async (req: Request, res: Response) => {
   try {
     const user_id = req.params.user_id;
@@ -35,7 +39,6 @@ const completedOrders = async (req: Request, res: Response) => {
   }
 };
 
-
 const create = async (req: Request, res: Response) => {
   try {
     const product = await store.create(req.body);
@@ -44,7 +47,6 @@ const create = async (req: Request, res: Response) => {
     res.status(400).json(`${err}`);
   }
 };
-
 
 const addProduct = async (req: Request, res: Response) => {
   try {
@@ -77,7 +79,6 @@ const addProduct = async (req: Request, res: Response) => {
   }
 };
 
-
 const closeOrder = async (req: Request, res: Response) => {
   try {
     const closedOrder = await store.closeOrder(req.params.order_id);
@@ -86,7 +87,6 @@ const closeOrder = async (req: Request, res: Response) => {
     res.status(400).json(`${err}`); 
   }
 };
-
 
 const getOrderDetails = async (req: Request, res: Response) => {
   try {
@@ -97,8 +97,7 @@ const getOrderDetails = async (req: Request, res: Response) => {
   } catch (err) {
     res.status(400).json(`${err}`); 
   }
-}
-
+};
 
 const checkOrder = async (req: Request, res: Response) => {
   try {
@@ -107,14 +106,11 @@ const checkOrder = async (req: Request, res: Response) => {
   } catch (err) {
     res.status(400).json(`${err}`); 
   }
-}
-
-
-
+};
 
 
 const ordersRouter = (app: express.Application) => {
-  // app.get('/orders', verifyAuthToken, index);
+  app.get('/orders', verifyAuthToken, index);
   app.get('/users/:user_id/orders/:order_id',verifyAuthToken, getOrder);
   app.get('/users/:user_id/orders/',verifyAuthToken, completedOrders);
   app.post('/orders', verifyAuthToken, create);

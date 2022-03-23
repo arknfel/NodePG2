@@ -42,8 +42,27 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var authz_1 = __importDefault(require("../middlewares/authz"));
 var order_1 = require("../models/order");
 var store = new order_1.OrderStore();
+var index = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var result, err_1;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 2, , 3]);
+                return [4 /*yield*/, store.index()];
+            case 1:
+                result = _a.sent();
+                res.json(result);
+                return [3 /*break*/, 3];
+            case 2:
+                err_1 = _a.sent();
+                res.status(400).json(err_1);
+                return [3 /*break*/, 3];
+            case 3: return [2 /*return*/];
+        }
+    });
+}); };
 var getOrder = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var order_id, user_id, order, err_1;
+    var order_id, user_id, order, err_2;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -56,15 +75,15 @@ var getOrder = function (req, res) { return __awaiter(void 0, void 0, void 0, fu
                 res.json(order);
                 return [3 /*break*/, 3];
             case 2:
-                err_1 = _a.sent();
-                res.status(400).json("".concat(err_1));
+                err_2 = _a.sent();
+                res.status(400).json("".concat(err_2));
                 return [3 /*break*/, 3];
             case 3: return [2 /*return*/];
         }
     });
 }); };
 var completedOrders = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var user_id, order, err_2;
+    var user_id, order, err_3;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -76,15 +95,15 @@ var completedOrders = function (req, res) { return __awaiter(void 0, void 0, voi
                 res.json(order);
                 return [3 /*break*/, 3];
             case 2:
-                err_2 = _a.sent();
-                res.status(400).json("".concat(err_2));
+                err_3 = _a.sent();
+                res.status(400).json("".concat(err_3));
                 return [3 /*break*/, 3];
             case 3: return [2 /*return*/];
         }
     });
 }); };
 var create = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var product, err_3;
+    var product, err_4;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -95,15 +114,15 @@ var create = function (req, res) { return __awaiter(void 0, void 0, void 0, func
                 res.json(product);
                 return [3 /*break*/, 3];
             case 2:
-                err_3 = _a.sent();
-                res.status(400).json("".concat(err_3));
+                err_4 = _a.sent();
+                res.status(400).json("".concat(err_4));
                 return [3 /*break*/, 3];
             case 3: return [2 /*return*/];
         }
     });
 }); };
 var addProduct = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var addedProduct, closedOrder, orderProducts, err_4;
+    var addedProduct, closedOrder, orderProducts, err_5;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -129,15 +148,15 @@ var addProduct = function (req, res) { return __awaiter(void 0, void 0, void 0, 
                 });
                 return [3 /*break*/, 6];
             case 5:
-                err_4 = _a.sent();
-                res.status(400).json("".concat(err_4));
+                err_5 = _a.sent();
+                res.status(400).json("".concat(err_5));
                 return [3 /*break*/, 6];
             case 6: return [2 /*return*/];
         }
     });
 }); };
 var closeOrder = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var closedOrder, err_5;
+    var closedOrder, err_6;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -148,15 +167,15 @@ var closeOrder = function (req, res) { return __awaiter(void 0, void 0, void 0, 
                 res.json(closedOrder);
                 return [3 /*break*/, 3];
             case 2:
-                err_5 = _a.sent();
-                res.status(400).json("".concat(err_5));
+                err_6 = _a.sent();
+                res.status(400).json("".concat(err_6));
                 return [3 /*break*/, 3];
             case 3: return [2 /*return*/];
         }
     });
 }); };
 var getOrderDetails = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var order, products, err_6;
+    var order, products, err_7;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -170,15 +189,15 @@ var getOrderDetails = function (req, res) { return __awaiter(void 0, void 0, voi
                 res.json({ order: order, products: products });
                 return [3 /*break*/, 4];
             case 3:
-                err_6 = _a.sent();
-                res.status(400).json("".concat(err_6));
+                err_7 = _a.sent();
+                res.status(400).json("".concat(err_7));
                 return [3 /*break*/, 4];
             case 4: return [2 /*return*/];
         }
     });
 }); };
 var checkOrder = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var order, err_7;
+    var order, err_8;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -189,15 +208,15 @@ var checkOrder = function (req, res) { return __awaiter(void 0, void 0, void 0, 
                 res.json(order);
                 return [3 /*break*/, 3];
             case 2:
-                err_7 = _a.sent();
-                res.status(400).json("".concat(err_7));
+                err_8 = _a.sent();
+                res.status(400).json("".concat(err_8));
                 return [3 /*break*/, 3];
             case 3: return [2 /*return*/];
         }
     });
 }); };
 var ordersRouter = function (app) {
-    // app.get('/orders', verifyAuthToken, index);
+    app.get('/orders', authz_1.default, index);
     app.get('/users/:user_id/orders/:order_id', authz_1.default, getOrder);
     app.get('/users/:user_id/orders/', authz_1.default, completedOrders);
     app.post('/orders', authz_1.default, create);
