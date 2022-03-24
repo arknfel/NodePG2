@@ -1,6 +1,5 @@
 import jwt, { Secret } from 'jsonwebtoken';
 import supertest from 'supertest';
-import { Order, OrderStore } from '../../src/models/order';
 import client from '../../src/database';
 import app from '../../src/server';
 
