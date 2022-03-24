@@ -7,7 +7,7 @@ import app from '../../src/server';
 
 const request = supertest(app);
 
-fdescribe('Orders Handler, all endpoints require a valid user-token', () => {
+describe('Orders Handler, all endpoints require a valid user-token', () => {
   beforeAll(async () => {
     // Reset table users before testing the order spec
     const conn = await client.connect();
