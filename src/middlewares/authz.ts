@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 
 const secret = process.env.TOKEN_SECRET as string;
 
-export const verifyAuthToken = (req: Request, res: Response, next: Function) => {
+export const adminAuthToken = (req: Request, res: Response, next: Function) => {
   try {
 
     const authorizationHeader = (req.headers.authorization as unknown) as string;
