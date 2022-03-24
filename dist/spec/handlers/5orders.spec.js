@@ -44,7 +44,7 @@ var supertest_1 = __importDefault(require("supertest"));
 var database_1 = __importDefault(require("../../src/database"));
 var server_1 = __importDefault(require("../../src/server"));
 var request = (0, supertest_1.default)(server_1.default);
-fdescribe('Orders Handler, all endpoints require a valid user-token', function () {
+describe('Orders Handler, all endpoints require a valid user-token', function () {
     beforeAll(function () { return __awaiter(void 0, void 0, void 0, function () {
         var conn;
         return __generator(this, function (_a) {
@@ -225,8 +225,25 @@ fdescribe('Orders Handler, all endpoints require a valid user-token', function (
                         .set('Authorization', "Bearer ".concat(spareToken))];
                 case 1:
                     response = _a.sent();
-                    console.log(response.body);
                     expect(response.status).toBe(200);
+                    expect(response.body).toEqual({
+                        order: { id: 1, user_id: '1', status: 'complete' },
+                        products: [
+                            {
+                                name: 'testProduct01',
+                                quantity: '3',
+                                price: '$42.42',
+                                cost: '$127.26'
+                            },
+                            {
+                                name: 'testProduct02',
+                                quantity: '5',
+                                price: '$10.00',
+                                cost: '$50.00'
+                            }
+                        ]
+                    });
+                    console.log(response.body);
                     return [2 /*return*/];
             }
         });

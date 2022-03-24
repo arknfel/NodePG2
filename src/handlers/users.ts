@@ -1,7 +1,7 @@
 import express, { Request, response, Response } from 'express';
 import { UserStore } from '../models/user';
 import jwt, {Secret} from 'jsonwebtoken';
-import verifyAuthToken from '../middlewares/authz';
+import { authzUser, verifyAuthToken } from '../middlewares/authz';
 
 
 const store = new UserStore();
@@ -82,7 +82,7 @@ const login = async (req: Request, res: Response) => {
 
 const usersRouter = (app: express.Application) => {
   app.get('/users', verifyAuthToken, index);
-  app.get('/users/:user_id', verifyAuthToken, get);
+  app.get('/users/:user_id', authzUser, get);
   app.post('/users/login', login);
   app.post('/users', create);
 }

@@ -41,7 +41,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var user_1 = require("../models/user");
 var jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-var authz_1 = __importDefault(require("../middlewares/authz"));
+var authz_1 = require("../middlewares/authz");
 var store = new user_1.UserStore();
 var index = function (_req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var users, err_1;
@@ -144,8 +144,8 @@ var login = function (req, res) { return __awaiter(void 0, void 0, void 0, funct
     });
 }); };
 var usersRouter = function (app) {
-    app.get('/users', authz_1.default, index);
-    app.get('/users/:user_id', authz_1.default, get);
+    app.get('/users', authz_1.verifyAuthToken, index);
+    app.get('/users/:user_id', authz_1.authzUser, get);
     app.post('/users/login', login);
     app.post('/users', create);
 };

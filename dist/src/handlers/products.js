@@ -35,12 +35,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 var product_1 = require("../models/product");
-var authz_1 = __importDefault(require("../middlewares/authz"));
+var authz_1 = require("../middlewares/authz");
 var store = new product_1.ProductStore();
 var index = function (_req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var products, err_1;
@@ -121,7 +118,7 @@ var hot = function (req, res) { return __awaiter(void 0, void 0, void 0, functio
 var productsRouter = function (app) {
     app.get('/products', index);
     app.get('/products/:id', get); // Show
-    app.post('/products', authz_1.default, create);
+    app.post('/products', authz_1.verifyAuthToken, create);
     app.get('/products/trends', hot);
 };
 exports.default = productsRouter;

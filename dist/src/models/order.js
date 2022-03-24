@@ -103,7 +103,6 @@ var OrderStore = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 3, , 4]);
-                        console.log('HI');
                         sql = "SELECT * from orders WHERE user_id=($1) \
         AND status='complete';";
                         return [4 /*yield*/, database_1.default.connect()];
@@ -156,7 +155,6 @@ var OrderStore = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 3, , 4]);
-                        console.log('HI');
                         sql = 'SELECT * FROM orders \
         WHERE id=($1);';
                         return [4 /*yield*/, (0, utils_1.connAvail)(currentConn, database_1.default)];

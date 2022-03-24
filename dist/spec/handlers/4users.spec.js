@@ -44,7 +44,7 @@ var supertest_1 = __importDefault(require("supertest"));
 var database_1 = __importDefault(require("../../src/database"));
 var server_1 = __importDefault(require("../../src/server"));
 var request = (0, supertest_1.default)(server_1.default);
-describe('Test endpoint responses', function () {
+describe('Users Handler', function () {
     beforeAll(function () { return __awaiter(void 0, void 0, void 0, function () {
         var conn;
         return __generator(this, function (_a) {

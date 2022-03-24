@@ -114,7 +114,6 @@ describe("Order Model", () => {
 
   it('getProducts()', async () => {
     const result = await orderStore.getProducts(1);
-    console.log(result);
     expect(result.length).toBeGreaterThan(0);
   });
 

@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import authzUser from '../middlewares/authz';
+import {authzUser} from '../middlewares/authz';
 import { Order, OrderProduct, OrderStore } from '../models/order';
 
 

@@ -6,7 +6,7 @@ import app from '../../src/server';
 const request = supertest(app);
 
 
-describe('Test endpoint responses', () => {
+describe('Users Handler', () => {
   beforeAll(async () => {
     // Reset table users before testing the order spec
     const conn = await client.connect();

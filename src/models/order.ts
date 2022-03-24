@@ -55,7 +55,6 @@ export class OrderStore {
 
   async completedOrders(user_id: number|string): Promise<(Order)[]> {
     try {
-      console.log('HI');
       const sql = "SELECT * from orders WHERE user_id=($1) \
         AND status='complete';";
       const conn = await client.connect();
@@ -90,7 +89,6 @@ export class OrderStore {
     currentConn?: PoolClient
   ): Promise<Order> {
     try {
-      console.log('HI');
       const sql = 'SELECT * FROM orders \
         WHERE id=($1);';
 

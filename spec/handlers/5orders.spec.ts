@@ -143,10 +143,26 @@ describe('Orders Handler, all endpoints require a valid user-token', () => {
   it('getOrderDetails, expect 200 and order details obj', async () => {
     const response = await request.get('/users/1/orders/1/details')
     .set('Authorization', `Bearer ${spareToken}`);
-    console.log(response.body);
 
     expect(response.status).toBe(200);
-    // expect(response.body).toEqual([{id: 1, user_id: '1', status: 'complete'}]);
+    expect(response.body).toEqual({
+      order: { id: 1, user_id: '1', status: 'complete' },
+      products: [
+        {
+          name: 'testProduct01',
+          quantity: '3',
+          price: '$42.42',
+          cost: '$127.26'
+        },
+        {
+          name: 'testProduct02',
+          quantity: '5',
+          price: '$10.00',
+          cost: '$50.00'
+        }
+      ]
+    });
+    console.log(response.body);
   });
 
 });

@@ -220,7 +220,6 @@ describe("Order Model", function () {
                 case 0: return [4 /*yield*/, orderStore.getProducts(1)];
                 case 1:
                     result = _a.sent();
-                    console.log(result);
                     expect(result.length).toBeGreaterThan(0);
                     return [2 /*return*/];
             }

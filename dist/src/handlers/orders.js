@@ -35,11 +35,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-var authz_1 = __importDefault(require("../middlewares/authz"));
+var authz_1 = require("../middlewares/authz");
 var order_1 = require("../models/order");
 var store = new order_1.OrderStore();
 // INDEX
@@ -212,12 +209,12 @@ var getOrderDetails = function (req, res) { return __awaiter(void 0, void 0, voi
     });
 }); };
 var ordersRouter = function (app) {
-    app.get('/users/:user_id/orders', authz_1.default, index);
-    app.get('/users/:user_id/orders/complete', authz_1.default, completedOrders);
-    app.get('/users/:user_id/orders/:order_id', authz_1.default, checkOrder);
-    app.post('/users/:user_id/orders', authz_1.default, create);
-    app.get('/users/:user_id/orders/:order_id/details', authz_1.default, getOrderDetails);
-    app.post('/users/:user_id/orders/:order_id/products', authz_1.default, addProduct);
-    app.put('/users/:user_id/orders/:order_id/close', authz_1.default, closeOrder);
+    app.get('/users/:user_id/orders', authz_1.authzUser, index);
+    app.get('/users/:user_id/orders/complete', authz_1.authzUser, completedOrders);
+    app.get('/users/:user_id/orders/:order_id', authz_1.authzUser, checkOrder);
+    app.post('/users/:user_id/orders', authz_1.authzUser, create);
+    app.get('/users/:user_id/orders/:order_id/details', authz_1.authzUser, getOrderDetails);
+    app.post('/users/:user_id/orders/:order_id/products', authz_1.authzUser, addProduct);
+    app.put('/users/:user_id/orders/:order_id/close', authz_1.authzUser, closeOrder);
 };
 exports.default = ordersRouter;
