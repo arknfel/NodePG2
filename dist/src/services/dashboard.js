@@ -40,8 +40,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DashboardQueries = void 0;
+// import { PoolClient } from 'pg';
 var database_1 = __importDefault(require("../database"));
-var utils_1 = require("../models/utils");
+// import { connAvail } from '../models/utils';
 var DashboardQueries = /** @class */ (function () {
     function DashboardQueries() {
     }
@@ -56,9 +57,11 @@ var DashboardQueries = /** @class */ (function () {
                         return [4 /*yield*/, database_1.default.connect()];
                     case 1:
                         conn = _a.sent();
-                        sql = 'SELECT * FROM products \
-        WHERE id in (SELECT TOP 5 product_id, sum(quantity) as Q \
-        GROUP BY product_id ORDER BY Q DESC);';
+                        sql = 'WITH temp_result AS \
+      (SELECT p.*, sum(quantity) as Q FROM \
+      products p JOIN order_products op ON p.id=op.product_id \
+      GROUP BY p.id ORDER BY Q DESC LIMIT 5) \
+      SELECT name, price FROM temp_result;';
                         return [4 /*yield*/, conn.query(sql)];
                     case 2:
                         result = _a.sent();
@@ -68,38 +71,6 @@ var DashboardQueries = /** @class */ (function () {
                         err_1 = _a.sent();
                         throw new Error("unable to generate trends report: ".concat(err_1));
                     case 4: return [2 /*return*/];
-                }
-            });
-        });
-    };
-    ;
-    // Get total costs per products of an order 
-    DashboardQueries.prototype.orderCosts = function (order_id, currentConn) {
-        return __awaiter(this, void 0, void 0, function () {
-            var sql, conn, result, err_2;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        sql = 'SELECT p.name as name, SUM(op.quantity) AS quantity \
-      , p.price AS price, SUM(p.price*op.quantity) AS cost \
-      FROM products p JOIN order_products op ON p.id=op.product_id \
-      WHERE op.order_id=($1) \
-      group by p.id, p.name, p.price;';
-                        _a.label = 1;
-                    case 1:
-                        _a.trys.push([1, 4, , 5]);
-                        return [4 /*yield*/, (0, utils_1.connAvail)(currentConn, database_1.default)];
-                    case 2:
-                        conn = _a.sent();
-                        return [4 /*yield*/, conn.query(sql, [order_id])];
-                    case 3:
-                        result = _a.sent();
-                        conn.release();
-                        return [2 /*return*/, result.rows];
-                    case 4:
-                        err_2 = _a.sent();
-                        throw new Error("Unable to get products of ".concat(order_id, ": \n\t").concat(err_2));
-                    case 5: return [2 /*return*/];
                 }
             });
         });

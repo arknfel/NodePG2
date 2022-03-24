@@ -27,7 +27,7 @@ describe("Order Model", () => {
 
   it('create() returns an Order', async () => {   
 
-    const result = await orderStore.create(order);
+    const result = await orderStore.create(order.user_id);
     
     expect(result).toEqual({
       id: 1,

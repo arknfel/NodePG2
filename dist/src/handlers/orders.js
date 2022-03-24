@@ -42,13 +42,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var authz_1 = __importDefault(require("../middlewares/authz"));
 var order_1 = require("../models/order");
 var store = new order_1.OrderStore();
+// INDEX
 var index = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var result, err_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 _a.trys.push([0, 2, , 3]);
-                return [4 /*yield*/, store.index()];
+                return [4 /*yield*/, store.index(req.params.user_id)];
             case 1:
                 result = _a.sent();
                 res.json(result);
@@ -61,15 +62,27 @@ var index = function (req, res) { return __awaiter(void 0, void 0, void 0, funct
         }
     });
 }); };
-var getOrder = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var order_id, user_id, order, err_2;
+// const getOrder = async (req: Request, res: Response) => {
+//   try {
+//     const order_id = req.params.order_id;
+//     const user_id = req.params.user_id;
+//     const order = await store.getOrder(
+//       order_id,
+//       user_id
+//     );
+//     res.json(order);
+//   } catch (err) {
+//     res.status(400).json(`${err}`); 
+//   }
+// };
+// SHOW
+var checkOrder = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var order, err_2;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 _a.trys.push([0, 2, , 3]);
-                order_id = req.params.order_id;
-                user_id = req.params.user_id;
-                return [4 /*yield*/, store.getOrder(order_id, user_id)];
+                return [4 /*yield*/, store.checkOrderStatus(req.params.order_id)];
             case 1:
                 order = _a.sent();
                 res.json(order);
@@ -82,17 +95,20 @@ var getOrder = function (req, res) { return __awaiter(void 0, void 0, void 0, fu
         }
     });
 }); };
-var completedOrders = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var user_id, order, err_3;
+// CREATE
+var create = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var product, err_3;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 _a.trys.push([0, 2, , 3]);
-                user_id = req.params.user_id;
-                return [4 /*yield*/, store.completedOrders(user_id)];
+                if (!req.params.user_id) {
+                    return [2 /*return*/, res.status(400).json('Invalid URL, missing user_id')];
+                }
+                return [4 /*yield*/, store.create(req.params.user_id)];
             case 1:
-                order = _a.sent();
-                res.json(order);
+                product = _a.sent();
+                res.json(product);
                 return [3 /*break*/, 3];
             case 2:
                 err_3 = _a.sent();
@@ -102,16 +118,17 @@ var completedOrders = function (req, res) { return __awaiter(void 0, void 0, voi
         }
     });
 }); };
-var create = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var product, err_4;
+var completedOrders = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var user_id, order, err_4;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 _a.trys.push([0, 2, , 3]);
-                return [4 /*yield*/, store.create(req.body)];
+                user_id = req.params.user_id;
+                return [4 /*yield*/, store.completedOrders(user_id)];
             case 1:
-                product = _a.sent();
-                res.json(product);
+                order = _a.sent();
+                res.json(order);
                 return [3 /*break*/, 3];
             case 2:
                 err_4 = _a.sent();
@@ -143,9 +160,7 @@ var addProduct = function (req, res) { return __awaiter(void 0, void 0, void 0, 
                         products: orderProducts
                     })];
             case 4:
-                res.json({
-                    product: addedProduct,
-                });
+                res.json(addedProduct);
                 return [3 /*break*/, 6];
             case 5:
                 err_5 = _a.sent();
@@ -196,48 +211,13 @@ var getOrderDetails = function (req, res) { return __awaiter(void 0, void 0, voi
         }
     });
 }); };
-var checkOrder = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var order, err_8;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                _a.trys.push([0, 2, , 3]);
-                return [4 /*yield*/, store.checkOrderStatus(req.params.order_id)];
-            case 1:
-                order = _a.sent();
-                res.json(order);
-                return [3 /*break*/, 3];
-            case 2:
-                err_8 = _a.sent();
-                res.status(400).json("".concat(err_8));
-                return [3 /*break*/, 3];
-            case 3: return [2 /*return*/];
-        }
-    });
-}); };
 var ordersRouter = function (app) {
-    app.get('/orders', authz_1.default, index);
-    app.get('/users/:user_id/orders/:order_id', authz_1.default, getOrder);
-    app.get('/users/:user_id/orders/', authz_1.default, completedOrders);
-    app.post('/orders', authz_1.default, create);
-    app.get('/orders/:order_id/products', getOrderDetails);
-    app.post('/orders/:order_id/products', addProduct);
-    app.put('/orders/:order_id/close', closeOrder);
-    app.get('/orders/:order_id/check', checkOrder);
+    app.get('/users/:user_id/orders', authz_1.default, index);
+    app.get('/users/:user_id/orders/complete', authz_1.default, completedOrders);
+    app.get('/users/:user_id/orders/:order_id', authz_1.default, checkOrder);
+    app.post('/users/:user_id/orders', authz_1.default, create);
+    app.get('/users/:user_id/orders/:order_id/details', authz_1.default, getOrderDetails);
+    app.post('/users/:user_id/orders/:order_id/products', authz_1.default, addProduct);
+    app.put('/users/:user_id/orders/:order_id/close', authz_1.default, closeOrder);
 };
 exports.default = ordersRouter;
-// const user_id = req.params.user_id;
-// let status = req.query.status as string;
-// if (
-//   !req.params.user_id
-//   || isNaN(parseInt(user_id))
-//   ) {
-//     res.status(404).json(`missing user_id`);
-// }
-// if (
-//   !status
-//   || !((status as string) === 'active')
-//   || !((status as string) === 'complete')
-//   ) {
-//     status = 'active'
-// }

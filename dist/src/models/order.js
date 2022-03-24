@@ -45,18 +45,19 @@ var utils_1 = require("./utils");
 var OrderStore = /** @class */ (function () {
     function OrderStore() {
     }
-    OrderStore.prototype.index = function () {
+    OrderStore.prototype.index = function (id) {
         return __awaiter(this, void 0, void 0, function () {
             var sql, conn, result, err_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 3, , 4]);
-                        sql = 'SELECT * from orders';
+                        sql = "SELECT * from orders \
+        WHERE status='active' AND user_id=($1);";
                         return [4 /*yield*/, database_1.default.connect()];
                     case 1:
                         conn = _a.sent();
-                        return [4 /*yield*/, conn.query(sql)];
+                        return [4 /*yield*/, conn.query(sql, [id])];
                     case 2:
                         result = _a.sent();
                         conn.release();
@@ -102,7 +103,9 @@ var OrderStore = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 3, , 4]);
-                        sql = "SELECT * from orders WHERE user_id=($1)         AND status='complete';";
+                        console.log('HI');
+                        sql = "SELECT * from orders WHERE user_id=($1) \
+        AND status='complete';";
                         return [4 /*yield*/, database_1.default.connect()];
                     case 1:
                         conn = _a.sent();
@@ -120,19 +123,19 @@ var OrderStore = /** @class */ (function () {
         });
     };
     ;
-    OrderStore.prototype.create = function (order) {
+    OrderStore.prototype.create = function (user_id) {
         return __awaiter(this, void 0, void 0, function () {
             var sql, conn, result, err_4;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 3, , 4]);
-                        sql = 'INSERT INTO orders (user_id, status) \
-        VALUES ($1, $2) RETURNING *;';
+                        sql = "INSERT INTO orders (user_id, status) \
+        VALUES ($1, 'active') RETURNING *;";
                         return [4 /*yield*/, database_1.default.connect()];
                     case 1:
                         conn = _a.sent();
-                        return [4 /*yield*/, conn.query(sql, [order.user_id, order.status])];
+                        return [4 /*yield*/, conn.query(sql, [user_id])];
                     case 2:
                         result = _a.sent();
                         conn.release();
@@ -153,6 +156,7 @@ var OrderStore = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 3, , 4]);
+                        console.log('HI');
                         sql = 'SELECT * FROM orders \
         WHERE id=($1);';
                         return [4 /*yield*/, (0, utils_1.connAvail)(currentConn, database_1.default)];
@@ -191,7 +195,7 @@ var OrderStore = /** @class */ (function () {
                         return [4 /*yield*/, this.checkOrderStatus(order_id, conn)];
                     case 2:
                         order = _a.sent();
-                        if (order.status == 'complete') {
+                        if (order && order.status == 'complete') {
                             conn.release();
                             throw new Error("order ".concat(order_id, " is already complete"));
                         }
@@ -225,8 +229,8 @@ var OrderStore = /** @class */ (function () {
                         if (order.status == 'complete') {
                             throw new Error("order ".concat(order_id, " is already complete"));
                         }
-                        sql = 'UPDATE orders SET status=\'complete\' \
-      WHERE id=($1) RETURNING *;';
+                        sql = "UPDATE orders SET status='complete' \
+      WHERE id=($1) RETURNING *;";
                         return [4 /*yield*/, conn.query(sql, [order_id])];
                     case 3:
                         result = _a.sent();

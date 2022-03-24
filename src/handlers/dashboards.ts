@@ -16,7 +16,7 @@ const topFiveSellers = async (_req: Request, res: Response) => {
 
 
 const dashboardRouter = (app: express.Application) => {
-  app.get('reports/top-five-sellers', topFiveSellers);
+  app.get('/reports/top-five-sellers', topFiveSellers);
 }
 
 export default dashboardRouter

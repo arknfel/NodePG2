@@ -44,7 +44,7 @@ var supertest_1 = __importDefault(require("supertest"));
 var database_1 = __importDefault(require("../../src/database"));
 var server_1 = __importDefault(require("../../src/server"));
 var request = (0, supertest_1.default)(server_1.default);
-fdescribe('Test endpoint responses', function () {
+describe('Test endpoint responses', function () {
     beforeAll(function () { return __awaiter(void 0, void 0, void 0, function () {
         var conn;
         return __generator(this, function (_a) {
@@ -92,10 +92,12 @@ fdescribe('Test endpoint responses', function () {
                         .send({
                         firstname: 'testUser',
                         password: 'UshallnotPASS'
-                    })];
+                    })
+                    // console.log('token ' + response.headers['authorization'].split(' ')[1]);
+                ];
                 case 1:
                     response = _a.sent();
-                    console.log('token ' + response.headers['authorization'].split(' ')[1]);
+                    // console.log('token ' + response.headers['authorization'].split(' ')[1]);
                     expect(response.status).toBe(200);
                     return [2 /*return*/];
             }
@@ -109,7 +111,7 @@ fdescribe('Test endpoint responses', function () {
                         .set('Authorization', "Bearer ".concat(spareToken))];
                 case 1:
                     response = _a.sent();
-                    console.log(response.body);
+                    // console.log(response.body);
                     expect(response.status).toBe(200);
                     expect(response.body).toEqual([{
                             id: 1,
@@ -128,7 +130,7 @@ fdescribe('Test endpoint responses', function () {
                         .set('Authorization', "Bearer ".concat(spareToken))];
                 case 1:
                     response = _a.sent();
-                    console.log(response.body);
+                    // console.log(response.body);
                     expect(response.status).toBe(200);
                     expect(response.body).toEqual({
                         id: 1,

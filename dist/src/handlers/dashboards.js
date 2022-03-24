@@ -58,6 +58,6 @@ var topFiveSellers = function (_req, res) { return __awaiter(void 0, void 0, voi
     });
 }); };
 var dashboardRouter = function (app) {
-    app.get('reports/top-five-sellers', topFiveSellers);
+    app.get('/reports/top-five-sellers', topFiveSellers);
 };
 exports.default = dashboardRouter;

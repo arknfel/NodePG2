@@ -75,7 +75,7 @@ describe("Order Model", function () {
         var result;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, orderStore.create(order)];
+                case 0: return [4 /*yield*/, orderStore.create(order.user_id)];
                 case 1:
                     result = _a.sent();
                     expect(result).toEqual({

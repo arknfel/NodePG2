@@ -1,33 +1,61 @@
 import express, { Request, Response } from 'express';
-import verifyAuthToken from '../middlewares/authz';
+import authzUser from '../middlewares/authz';
 import { Order, OrderProduct, OrderStore } from '../models/order';
 
 
 const store = new OrderStore();
 
+
+// INDEX
 const index = async(req: Request, res: Response) => {
   try {
-    const result = await store.index();
+    const result = await store.index(req.params.user_id);
     res.json(result);
   } catch (err) {
     res.status(400).json(err);
   }
 }
 
-const getOrder = async (req: Request, res: Response) => {
-  try {
-    const order_id = req.params.order_id;
-    const user_id = req.params.user_id;
+// const getOrder = async (req: Request, res: Response) => {
+//   try {
+//     const order_id = req.params.order_id;
+//     const user_id = req.params.user_id;
 
-    const order = await store.getOrder(
-      order_id,
-      user_id
-    );
+//     const order = await store.getOrder(
+//       order_id,
+//       user_id
+//     );
+//     res.json(order);
+//   } catch (err) {
+//     res.status(400).json(`${err}`); 
+//   }
+// };
+
+
+// SHOW
+const checkOrder = async (req: Request, res: Response) => {
+  try {
+    const order = await store.checkOrderStatus(req.params.order_id);
     res.json(order);
   } catch (err) {
     res.status(400).json(`${err}`); 
   }
 };
+
+
+// CREATE
+const create = async (req: Request, res: Response) => {
+  try {
+    if (!req.params.user_id) {
+      return res.status(400).json('Invalid URL, missing user_id');
+    }
+    const product = await store.create(req.params.user_id);
+    res.json(product);
+  } catch (err) {
+    res.status(400).json(`${err}`);
+  }
+};
+
 
 const completedOrders = async (req: Request, res: Response) => {
   try {
@@ -39,14 +67,6 @@ const completedOrders = async (req: Request, res: Response) => {
   }
 };
 
-const create = async (req: Request, res: Response) => {
-  try {
-    const product = await store.create(req.body);
-    res.json(product);
-  } catch (err) {
-    res.status(400).json(`${err}`);
-  }
-};
 
 const addProduct = async (req: Request, res: Response) => {
   try {
@@ -70,9 +90,7 @@ const addProduct = async (req: Request, res: Response) => {
       });
     }
 
-    res.json({
-      product: addedProduct,
-    });
+    res.json(addedProduct);
 
   } catch (err) {
     res.status(400).json(`${err}`);
@@ -99,45 +117,17 @@ const getOrderDetails = async (req: Request, res: Response) => {
   }
 };
 
-const checkOrder = async (req: Request, res: Response) => {
-  try {
-    const order = await store.checkOrderStatus(req.params.order_id);
-    res.json(order);
-  } catch (err) {
-    res.status(400).json(`${err}`); 
-  }
-};
-
 
 const ordersRouter = (app: express.Application) => {
-  app.get('/orders', verifyAuthToken, index);
-  app.get('/users/:user_id/orders/:order_id',verifyAuthToken, getOrder);
-  app.get('/users/:user_id/orders/',verifyAuthToken, completedOrders);
-  app.post('/orders', verifyAuthToken, create);
-  app.get('/orders/:order_id/products', getOrderDetails);
-  app.post('/orders/:order_id/products', addProduct);
-  app.put('/orders/:order_id/close', closeOrder);
-  app.get('/orders/:order_id/check', checkOrder);
+  app.get('/users/:user_id/orders', authzUser, index);
+  app.get('/users/:user_id/orders/complete', authzUser, completedOrders);
+  app.get('/users/:user_id/orders/:order_id', authzUser, checkOrder);
+  app.post('/users/:user_id/orders', authzUser, create);
+  app.get('/users/:user_id/orders/:order_id/details', authzUser, getOrderDetails);
+  app.post('/users/:user_id/orders/:order_id/products', authzUser, addProduct);
+  app.put('/users/:user_id/orders/:order_id/close', authzUser, closeOrder);
+
 };
 
 
 export default ordersRouter;
-
-
-
-// const user_id = req.params.user_id;
-// let status = req.query.status as string;
-
-// if (
-//   !req.params.user_id
-//   || isNaN(parseInt(user_id))
-//   ) {
-//     res.status(404).json(`missing user_id`);
-// }
-// if (
-//   !status
-//   || !((status as string) === 'active')
-//   || !((status as string) === 'complete')
-//   ) {
-//     status = 'active'
-// }

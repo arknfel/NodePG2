@@ -24,11 +24,12 @@ export type OrderProduct = {
 
 export class OrderStore {
 
-  async index(): Promise<(Order)[]> {
+  async index(id: number|string): Promise<(Order)[]> {
     try {
-      const sql = 'SELECT * from orders';
+      const sql = "SELECT * from orders \
+        WHERE status='active' AND user_id=($1);";
       const conn = await client.connect();
-      const result = await conn.query(sql);
+      const result = await conn.query(sql, [id]);
       conn.release();
       return result.rows;
     } catch (err) {
@@ -54,8 +55,9 @@ export class OrderStore {
 
   async completedOrders(user_id: number|string): Promise<(Order)[]> {
     try {
-      const sql = `SELECT * from orders WHERE user_id=($1) \
-        AND status='complete';`;
+      console.log('HI');
+      const sql = "SELECT * from orders WHERE user_id=($1) \
+        AND status='complete';";
       const conn = await client.connect();
       const result = await conn.query(sql, [user_id]);
       conn.release();
@@ -67,13 +69,13 @@ export class OrderStore {
   };
 
 
-  async create(order: Order): Promise<OrderEntry> {
+  async create(user_id: number|string): Promise<OrderEntry> {
     try {
-      const sql = 'INSERT INTO orders (user_id, status) \
-        VALUES ($1, $2) RETURNING *;';
+      const sql = "INSERT INTO orders (user_id, status) \
+        VALUES ($1, 'active') RETURNING *;";
 
       const conn = await client.connect();
-      const result = await conn.query(sql, [order.user_id, order.status]);
+      const result = await conn.query(sql, [user_id]);
       conn.release();
       return result.rows[0];
 
@@ -88,6 +90,7 @@ export class OrderStore {
     currentConn?: PoolClient
   ): Promise<Order> {
     try {
+      console.log('HI');
       const sql = 'SELECT * FROM orders \
         WHERE id=($1);';
 
@@ -122,7 +125,7 @@ export class OrderStore {
         conn
       );
 
-      if (order.status == 'complete') {
+      if (order && order.status == 'complete') {
         conn.release();
         throw new Error(`order ${order_id} is already complete`);
       }
@@ -152,8 +155,8 @@ export class OrderStore {
         throw new Error(`order ${order_id} is already complete`);
       }
 
-      const sql = 'UPDATE orders SET status=\'complete\' \
-      WHERE id=($1) RETURNING *;';
+      const sql = "UPDATE orders SET status='complete' \
+      WHERE id=($1) RETURNING *;";
 
       const result = await conn.query(sql, [order_id]);
       conn.release();
