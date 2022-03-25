@@ -66,16 +66,22 @@ to install all dependencies:
 $ npm install
 ```
 ### Unit Tests & Usage
-If everything is setup correctly, running the following npm script will run all the unit test on the API application and all Model and Handler tests should pass:
+If everything is setup correctly, running the following npm script will run all the unit tests on the API application and all Model and Handler specs should pass:
 ```bash
 $ npm run test
 ```  
 
-To start the Typescript based server
+To get started and test the API endpoints via a tool like Postman, the first thing that we need to do,  
+is to apply all migrations to sfdb_dev:
+```bash
+$ db-migrate -e dev up
+```
+
+We can then start the Typescript based server:
 ```bash
 $ npm run dev
 ```  
-To start the JS based server
+or start the JS based server:
 ```bash
 $ npm run start
 ```
@@ -88,6 +94,13 @@ Users can signup/signin to acquire a token. Most end-points expects a valid user
 specifically end-points that are to serve a specific user.
 
 There are two types of tokens, user and admin token.  
+
+An admin user can be created by signing up,
+flip the  isadmin boolan flag via a db query, for user_id=1:
+```sql
+UPDATE users SET isadmin=true WHERE id=1;
+```  
+The admin user can now signin to acquire an admin token.
 
 The base URL of the API by default is:
 `http://127.0.0.1:3000`  
