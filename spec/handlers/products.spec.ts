@@ -6,9 +6,9 @@ import app from '../../src/server';
 
 const request = supertest(app);
 
-fdescribe('Products Handler, creat/update a product requires a valid user-token', () => {
+describe('Products Handler, creat/update a product requires a valid user-token', () => {
   beforeAll(async () => {
-    // Reset all table users before testing the order spec
+    // Reset all tables before testing
     const conn = await client.connect();
     await conn.query("TRUNCATE users RESTART IDENTITY CASCADE;");
     await conn.query("TRUNCATE orders RESTART IDENTITY CASCADE;");

@@ -39,12 +39,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 var supertest_1 = __importDefault(require("supertest"));
 var database_1 = __importDefault(require("../../src/database"));
 var server_1 = __importDefault(require("../../src/server"));
 var request = (0, supertest_1.default)(server_1.default);
-describe('Products Handler, creat/update a product requires a valid user-token', function () {
+describe('Dashboards Handler', function () {
     beforeAll(function () { return __awaiter(void 0, void 0, void 0, function () {
         var conn;
         return __generator(this, function (_a) {
@@ -61,101 +60,76 @@ describe('Products Handler, creat/update a product requires a valid user-token',
                     return [4 /*yield*/, conn.query("TRUNCATE products RESTART IDENTITY CASCADE;")];
                 case 4:
                     _a.sent();
-                    // creating a user and a product to satisfy foriegn-key constrains 
+                    // creating a mock user to satisfy foriegn-key constrains 
                     return [4 /*yield*/, conn.query("INSERT INTO users (username, firstname, lastname, password, isAdmin) \
       VALUES ('testUser', '__', '__', 'UshallnotPASS', '0');")];
                 case 5:
-                    // creating a user and a product to satisfy foriegn-key constrains 
+                    // creating a mock user to satisfy foriegn-key constrains 
                     _a.sent();
-                    // await conn.query("INSERT INTO products (name, price) \
-                    //   VALUES ('testProduct01', 42.42);");
-                    // await conn.query("INSERT INTO products (name, price) \
-                    // VALUES ('testProduct02', 10);");
+                    // creating a mock order
+                    return [4 /*yield*/, conn.query("INSERT INTO orders (user_id, status) \
+      VALUES (1, 'complete')")];
+                case 6:
+                    // creating a mock order
+                    _a.sent();
+                    // creating 6 products
+                    return [4 /*yield*/, conn.query("INSERT INTO products (name, price) \
+      VALUES ('testProduct01', 42.42); \
+      INSERT INTO products (name, price) \
+      VALUES ('testProduct02', 10); \
+      INSERT INTO products (name, price) \
+      VALUES ('testProduct03', 5.50); \
+      INSERT INTO products (name, price) \
+      VALUES ('testProduct04', 100); \
+      INSERT INTO products (name, price) \
+      VALUES ('testProduct05', 2022.25); \
+      INSERT INTO products (name, price) \
+      VALUES ('testProduct06', 99);")];
+                case 7:
+                    // creating 6 products
+                    _a.sent();
+                    // creating 6 add-product actions
+                    return [4 /*yield*/, conn.query("INSERT INTO order_products \
+      (quantity, order_id, product_id) \
+      VALUES (2, 1, 1); \
+      INSERT INTO order_products \
+      (quantity, order_id, product_id) \
+      VALUES (3, 1, 2); \
+      INSERT INTO order_products \
+      (quantity, order_id, product_id) \
+      VALUES (4, 1, 3); \
+      INSERT INTO order_products \
+      (quantity, order_id, product_id) \
+      VALUES (5, 1, 4); \
+      INSERT INTO order_products \
+      (quantity, order_id, product_id) \
+      VALUES (6, 1, 5); \
+      INSERT INTO order_products \
+      (quantity, order_id, product_id) \
+      VALUES (1, 1, 6);")];
+                case 8:
+                    // creating 6 add-product actions
+                    _a.sent();
                     conn.release();
                     return [2 /*return*/];
             }
         });
     }); }); // BEFORE ALL ends
-    var user = {
-        id: 1,
-        firstname: 'testUser',
-        lastname: '__',
-        password: '__',
-        isadmin: false
-    };
-    var secret = process.env.TOKEN_SECRET;
-    var mockToken = jsonwebtoken_1.default.sign({
-        user: {
-            id: user.id,
-            firstname: user.firstname
-        }
-    }, secret);
-    // isadmin property is added to mock the admin token
-    var adminMockToken = jsonwebtoken_1.default.sign({
-        user: {
-            id: user.id,
-            firstname: user.firstname,
-            isadmin: true
-        }
-    }, secret);
-    it('create, expect 200, product obj', function () { return __awaiter(void 0, void 0, void 0, function () {
+    it('topFiveSellers return top 5 sellers in terms of quantity', function () { return __awaiter(void 0, void 0, void 0, function () {
         var response;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, request.post('/products')
-                        .set('Authorization', "Bearer ".concat(adminMockToken))
-                        .send({
-                        name: 'testProduct01',
-                        price: '42.42'
-                    })];
+                case 0: return [4 /*yield*/, request.get('/reports/top-five-sellers')];
                 case 1:
                     response = _a.sent();
                     expect(response.status).toBe(200);
-                    expect(response.body).toEqual({
-                        id: 1,
-                        name: 'testProduct01',
-                        price: '$42.42'
-                    });
-                    return [2 /*return*/];
-            }
-        });
-    }); });
-    it('index, expect a list of product objs', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var response;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, request.get('/products')
-                        .set('Authorization', "Bearer ".concat(adminMockToken))];
-                case 1:
-                    response = _a.sent();
-                    expect(response.status).toBe(200);
-                    expect(response.body).toEqual([{
-                            id: 1,
-                            name: 'testProduct01',
-                            price: '$42.42'
-                        }]);
-                    return [2 /*return*/];
-            }
-        });
-    }); });
-    it('Update, expect 200, updated order objs', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var response;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, request.put('/products/1')
-                        .set('Authorization', "Bearer ".concat(adminMockToken))
-                        .send({
-                        name: 'testProduct01',
-                        price: '42.42'
-                    })];
-                case 1:
-                    response = _a.sent();
-                    expect(response.status).toBe(200);
-                    expect(response.body).toEqual({
-                        id: 1,
-                        name: 'testProduct01',
-                        price: '$42.42'
-                    });
+                    expect(response.body).toEqual([
+                        { name: 'testProduct05', price: '$2,022.25' },
+                        { name: 'testProduct04', price: '$100.00' },
+                        { name: 'testProduct03', price: '$5.50' },
+                        { name: 'testProduct02', price: '$10.00' },
+                        { name: 'testProduct01', price: '$42.42' }
+                    ]);
                     return [2 /*return*/];
             }
         });

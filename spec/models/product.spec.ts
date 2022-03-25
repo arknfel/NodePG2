@@ -7,11 +7,10 @@ const productStore = new ProductStore();
 describe("Product Model", () => {
 
   beforeAll(async () => {
-    // Reset all table users before testing the order spec
+    // Reset all tables before testing
     const conn = await client.connect();
-    await conn.query("TRUNCATE users RESTART IDENTITY CASCADE;");
-    await conn.query("TRUNCATE orders RESTART IDENTITY CASCADE;");
-    await conn.query("TRUNCATE products RESTART IDENTITY CASCADE;");
+    await conn.query("TRUNCATE users RESTART IDENTITY CASCADE; \
+      TRUNCATE products RESTART IDENTITY CASCADE;");
 
     // creating a user and a product to satisfy foriegn-key constrains 
     await conn.query("INSERT INTO users (username, firstname, lastname, password, isAdmin) \

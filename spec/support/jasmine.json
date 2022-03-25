@@ -1,7 +1,14 @@
 {
   "spec_dir": "dist/spec",
   "spec_files": [
-    "**/*[sS]pec.?(m)js"
+    "**/user[.]spec[.]js",
+    "**/order.spec.js",
+    "**/product[.]spec[.]js",
+    "**/dashboard.spec.js",
+    "**/users.spec.js",
+    "**/orders.spec.js",
+    "**/products.spec.js",
+    "**/dashboards.spec.js"
   ],
   "helpers": [
     "helpers/**/*.?(m)js"

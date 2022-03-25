@@ -6,9 +6,10 @@
   "scripts": {
     "build": "npx tsc",
     "init_test_db": "db-migrate db:create mydb_test",
-    "jaz": "npm run build&&npx jasmine --random=false",
+    "jaz": "npm run build && npx jasmine --random=false",
     "test": "cross-env-shell ENV=test \"db-migrate db:drop mydb_test && db-migrate db:create mydb_test && db-migrate up -e test && npm run jaz\"",
-    "dev": "nodemon --exec npx ts-node \"./src/server.ts\""
+    "dev": "nodemon --exec npx ts-node \"./src/server.ts\"",
+    "start": "node ./dist/src/server.js"
   },
   "keywords": [
     "Jasmine",
