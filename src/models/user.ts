@@ -9,16 +9,20 @@ const saltRounds = (process.env.SALT_R as unknown) as string;
 
 export type User = {
   id?: number|string;
+  username: string;
   firstname: string;
   lastname: string;
   password: string;
+  isadmin?: boolean;
 };
 
 export type UserEntry = {
   id?: number|string;
+  username?: string;
   firstname?: string;
   lastname?: string;
   password?: string;
+  isadmin?: boolean;
 };
 
 export class UserStore {
@@ -26,7 +30,7 @@ export class UserStore {
   async index(): Promise <(User)[]> {
     try {
       const conn = await client.connect();
-      const sql = 'SELECT id, firstname, lastname from users;';
+      const sql = 'SELECT id, username, firstname, lastname, isAdmin from users;';
       const result = await conn.query(sql);
       conn.release();
       return result.rows;
@@ -38,15 +42,11 @@ export class UserStore {
   async get(user_id: string, currentConn?: PoolClient): Promise<UserEntry> {
     try {
       const conn = await connAvail(currentConn, client);
-      const sql = 'SELECT * FROM users WHERE id=($1);';
+      const sql = 'SELECT id, username, firstname, lastname FROM users WHERE id=($1);';
       const result: QueryResult<User> = await conn.query(sql, [user_id]);
       conn.release();
-      const user = result.rows[0]
-      return {
-        id: user.id,
-        firstname: user.firstname,
-        lastname: user.lastname
-      }
+      return result.rows[0];
+
     } catch (err) {
       throw `unable to get user: ${err}`;
     }
@@ -56,13 +56,12 @@ export class UserStore {
     try {
 
       const conn = await client.connect()
-      const userExists = await this.userExists(user.firstname, conn);
+      const userExists = await this.userExists(user.username, conn);
 
-      if (userExists.length > 0) { return null }
+      if (userExists) { return null }
 
-      const sql = 'INSERT INTO users (firstname, \
-        lastname, password) \
-        VALUES ($1, $2, $3) RETURNING *;';
+      const sql = "INSERT INTO users (username, firstname, \
+        lastname, password, isAdmin) VALUES ($1, $2, $3, $4, '0') RETURNING *;";
       
       const hash = bcrypt.hashSync(
         user.password + pepper,
@@ -71,11 +70,12 @@ export class UserStore {
 
       const result = await conn.query(
         sql,
-        [user.firstname, user.lastname, hash]
+        [user.username, user.firstname, user.lastname, hash]
       );
       conn.release();
       return {
         id: result.rows[0].id,
+        username: result.rows[0].username,
         firstname: result.rows[0].firstname,
         lastname: result.rows[0].lastname
       };
@@ -85,28 +85,28 @@ export class UserStore {
     }
   };
 
-  async userExists (firstname: string, conn: PoolClient): Promise<(User)[]> {
+  async userExists (username: string, conn: PoolClient): Promise<UserEntry> {
     const sql = 'SELECT * FROM users \
-      WHERE firstname=($1);';
-    const result = await conn.query(sql, [firstname]);
-    return result.rows;
+      WHERE username=($1);';
+    const result = await conn.query(sql, [username]);
+    return result.rows[0];
   };
 
   async authenticate(
-    firstname: string, password: string
+    username: string, password: string
   ): Promise<UserEntry|null> {
 
     const conn = await client.connect();
-    const result = await this.userExists(firstname, conn);
+    const user = await this.userExists(username, conn);
     conn.release();
 
-    if ( result.length > 0 ) {
-      let user = result[0]; 
+    if (user) { 
 
-      if (bcrypt.compareSync(password + pepper, user.password)) {
-        return {id: user.id, firstname: user.firstname};
+      if (bcrypt.compareSync(password + pepper, user.password as string)) {
+        return {id: user.id, username: user.username, isadmin: user.isadmin};
       }
     }
+
     return null
   };
 }

@@ -7,18 +7,22 @@ const orderStore = new OrderStore();
 describe("Order Model", () => {
 
   beforeAll(async () => {
-    // Reset table users before testing the order spec
+    // Reset all table users before testing the order spec
     const conn = await client.connect();
     await conn.query("TRUNCATE users RESTART IDENTITY CASCADE;");
+    await conn.query("TRUNCATE orders RESTART IDENTITY CASCADE;");
+    await conn.query("TRUNCATE products RESTART IDENTITY CASCADE;");
 
     // creating a user and a product to satisfy foriegn-key constrains 
-    await conn.query("INSERT INTO users (firstname, lastname, password) \
-      VALUES ('testUser', 'lastname', 'UshallnotPASS');")
+    await conn.query("INSERT INTO users (username, firstname, lastname, password, isAdmin) \
+      VALUES ('testUser', '__', '__', 'UshallnotPASS', '0');");
     
     await conn.query("INSERT INTO products (name, price) \
-      VALUES ('testProduct01', 42.42);").then(() => conn.release());
-    
-  });
+      VALUES ('testProduct01', 42.42);");
+
+    conn.release();
+  }); // BEFORE ALL ends
+
 
   const order: Order = {
     user_id: '1',

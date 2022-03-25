@@ -6,14 +6,18 @@ const store = new UserStore();
 
 describe("User Model", async () => {
   beforeAll( async () => {
+    // Reset all table users before testing the order spec
     const conn = await client.connect();
-    await conn.query('TRUNCATE users RESTART IDENTITY CASCADE;');
+    await conn.query("TRUNCATE users RESTART IDENTITY CASCADE;");
+    await conn.query("TRUNCATE orders RESTART IDENTITY CASCADE;");
+    await conn.query("TRUNCATE products RESTART IDENTITY CASCADE;");
     conn.release();
-  });
+  }); // BEFORE ALL ENDS
 
   const user: User = {
-    firstname: "testUser",
-    lastname: "lastname",
+    username: 'testUser',
+    firstname: "__",
+    lastname: "__",
     password: "UshallnotPASS"
   };
 
@@ -28,8 +32,9 @@ describe("User Model", async () => {
 
       expect(result).toEqual({
         id: 1,
-        firstname: 'testUser',
-        lastname: 'lastname'
+        username: 'testUser',
+        firstname: '__',
+        lastname: '__'
       });
   });
 
@@ -37,25 +42,30 @@ describe("User Model", async () => {
       const result = await store.get('1');
       expect(result).toEqual({
         id: 1,
-        firstname: 'testUser',
-        lastname: 'lastname'
+        username: 'testUser',
+        firstname: '__',
+        lastname: '__'
       });
   });
 
   it('method userExists() return a User if exists', async () => {
       const conn = await client.connect();
-      const result = await store.userExists(user.firstname, conn);
+      const result = await store.userExists(user.username, conn);
       conn.release();
-      expect(result.length).toEqual(1);
+      expect(result).toBeDefined();
   });
 
   it('method authenticate() return User or null', async () => {
       // valid password
-      let result = await store.authenticate(user.firstname, user.password);
-      expect(result?.id).toEqual(1);
+      let authedUser = await store.authenticate(user.username, user.password);
+      expect(authedUser).toEqual({
+        id: 1,
+        username: 'testUser',
+        isadmin: false
+      });
 
       // invalid password
-      result = await store.authenticate(user.firstname, 'AwrongPass');
-      expect(result).toEqual(null);
+      authedUser = await store.authenticate(user.firstname, 'AwrongPass');
+      expect(authedUser).toEqual(null);
   });
 });

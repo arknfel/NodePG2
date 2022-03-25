@@ -8,13 +8,15 @@ const request = supertest(app);
 
 describe('Orders Handler, all endpoints require a valid user-token', () => {
   beforeAll(async () => {
-    // Reset table users before testing the order spec
+    // Reset all table users before testing the order spec
     const conn = await client.connect();
     await conn.query("TRUNCATE users RESTART IDENTITY CASCADE;");
+    await conn.query("TRUNCATE orders RESTART IDENTITY CASCADE;");
+    await conn.query("TRUNCATE products RESTART IDENTITY CASCADE;");
 
     // creating a user and a product to satisfy foriegn-key constrains 
-    await conn.query("INSERT INTO users (firstname, lastname, password) \
-      VALUES ('testUser', 'lastname', 'UshallnotPASS');")
+    await conn.query("INSERT INTO users (username, firstname, lastname, password, isAdmin) \
+      VALUES ('testUser', '__', '__', 'UshallnotPASS', '0');");
 
     await conn.query("INSERT INTO products (name, price) \
       VALUES ('testProduct01', 42.42);");
@@ -22,21 +24,20 @@ describe('Orders Handler, all endpoints require a valid user-token', () => {
     await conn.query("INSERT INTO products (name, price) \
     VALUES ('testProduct02', 10);");
     conn.release();
-  });
+  }); // BEFORE ALL ends
 
 
   const user = {
     id: 1,
-    firstname: 'testUser',
-    lastname: 'lastname',
+    username: 'testUser',
     password: 'UshallnotPASS'
   };
 
   const secret = (process.env.TOKEN_SECRET as unknown) as Secret;
-  const spareToken = jwt.sign({
+  const mockToken = jwt.sign({
     user: {
       id: user.id,
-      firstname: user.firstname
+      username: user.username
     }
   }, secret);
 
@@ -45,11 +46,11 @@ describe('Orders Handler, all endpoints require a valid user-token', () => {
   it('create order, expect 200 and order obj', async () => {
     // create first order
     await request.post('/users/1/orders')
-    .set('Authorization', `Bearer ${spareToken}`)
+    .set('Authorization', `Bearer ${mockToken}`)
 
     // create second order
     const response = await request.post('/users/1/orders')
-    .set('Authorization', `Bearer ${spareToken}`)
+    .set('Authorization', `Bearer ${mockToken}`)
     
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
@@ -63,7 +64,7 @@ describe('Orders Handler, all endpoints require a valid user-token', () => {
   // INDEX
   it('index, expect 200 and list of active orders', async () => {
     const response = await request.get('/users/1/orders')
-    .set('Authorization', `Bearer ${spareToken}`);
+    .set('Authorization', `Bearer ${mockToken}`);
     
     expect(response.status).toBe(200);
     
@@ -80,7 +81,7 @@ describe('Orders Handler, all endpoints require a valid user-token', () => {
   // SHOW
   it('checkOrder, expect 200 and order obj', async () => {
     const response = await request.get('/users/1/orders/1')
-    .set('Authorization', `Bearer ${spareToken}`);
+    .set('Authorization', `Bearer ${mockToken}`);
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
@@ -91,17 +92,16 @@ describe('Orders Handler, all endpoints require a valid user-token', () => {
   });
 
 
-  //
   it('addProduct, expect 200 and order_product obj', async () => {
     await request.post('/users/1/orders/1/products')
-    .set('Authorization', `Bearer ${spareToken}`)
+    .set('Authorization', `Bearer ${mockToken}`)
     .send({
       quantity: '3',
       product_id: '1'
     })
 
     const response = await request.post('/users/1/orders/1/products')
-    .set('Authorization', `Bearer ${spareToken}`)
+    .set('Authorization', `Bearer ${mockToken}`)
     .send({
       quantity: '5',
       product_id: '2'
@@ -118,7 +118,7 @@ describe('Orders Handler, all endpoints require a valid user-token', () => {
 
   it('closeOrder, expect 200 and closed order obj', async () => {
     const response = await request.put('/users/1/orders/1/close')
-    .set('Authorization', `Bearer ${spareToken}`);
+    .set('Authorization', `Bearer ${mockToken}`);
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
@@ -131,7 +131,7 @@ describe('Orders Handler, all endpoints require a valid user-token', () => {
 
   it('show complete orders, expect 200 and closed order obj', async () => {
     const response = await request.get('/users/1/orders/complete')
-    .set('Authorization', `Bearer ${spareToken}`);
+    .set('Authorization', `Bearer ${mockToken}`);
     // console.log(Object.entries(response.body));
 
     expect(response.status).toBe(200);
@@ -141,7 +141,7 @@ describe('Orders Handler, all endpoints require a valid user-token', () => {
 
   it('getOrderDetails, expect 200 and order details obj', async () => {
     const response = await request.get('/users/1/orders/1/details')
-    .set('Authorization', `Bearer ${spareToken}`);
+    .set('Authorization', `Bearer ${mockToken}`);
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({

@@ -9,8 +9,11 @@ export const adminAuthToken = (req: Request, res: Response, next: Function) => {
 
     const authorizationHeader = (req.headers.authorization as unknown) as string;
     const token = authorizationHeader.split(' ')[1];
-    const decoded = jwt.verify(token, secret);
-    // console.log(decoded);
+    const decoded = (jwt.verify(token, secret) as unknown) as jwt.JwtPayload;
+
+    if (!decoded.user.isadmin) {
+      return res.status(401).json('unauthorized');
+    }
     next();
 
   } catch (err) {
@@ -21,9 +24,11 @@ export const adminAuthToken = (req: Request, res: Response, next: Function) => {
 
 export const authzUser = (req: Request, res: Response, next: Function) => {
   try {
+
     if (!req.params.user_id) {
       return res.status(401).json('invalid URL, missing user_id')
     }
+
     if (!req.headers['authorization']) {
       return res.status(401).json(`missing token`);
     }
@@ -33,10 +38,11 @@ export const authzUser = (req: Request, res: Response, next: Function) => {
     const decoded = (jwt.verify(token, secret) as unknown) as jwt.JwtPayload;
     // console.log(decoded);
     if (decoded.user.id !== parseInt(req.params.user_id)) {
-      return res.status(401).json(`not authorized`);
+      return res.status(401).json(`unauthorized`);
     }
 
     next();
+
   } catch (err) {
     return res.status(401).json(`Invalid or missing token`);
   }

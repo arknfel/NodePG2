@@ -55,36 +55,41 @@ describe('Orders Handler, all endpoints require a valid user-token', function ()
                     return [4 /*yield*/, conn.query("TRUNCATE users RESTART IDENTITY CASCADE;")];
                 case 2:
                     _a.sent();
-                    // creating a user and a product to satisfy foriegn-key constrains 
-                    return [4 /*yield*/, conn.query("INSERT INTO users (firstname, lastname, password) \
-      VALUES ('testUser', 'lastname', 'UshallnotPASS');")];
+                    return [4 /*yield*/, conn.query("TRUNCATE orders RESTART IDENTITY CASCADE;")];
                 case 3:
+                    _a.sent();
+                    return [4 /*yield*/, conn.query("TRUNCATE products RESTART IDENTITY CASCADE;")];
+                case 4:
+                    _a.sent();
+                    // creating a user and a product to satisfy foriegn-key constrains 
+                    return [4 /*yield*/, conn.query("INSERT INTO users (username, firstname, lastname, password, isAdmin) \
+      VALUES ('testUser', '__', '__', 'UshallnotPASS', '0');")];
+                case 5:
                     // creating a user and a product to satisfy foriegn-key constrains 
                     _a.sent();
                     return [4 /*yield*/, conn.query("INSERT INTO products (name, price) \
       VALUES ('testProduct01', 42.42);")];
-                case 4:
+                case 6:
                     _a.sent();
                     return [4 /*yield*/, conn.query("INSERT INTO products (name, price) \
     VALUES ('testProduct02', 10);")];
-                case 5:
+                case 7:
                     _a.sent();
                     conn.release();
                     return [2 /*return*/];
             }
         });
-    }); });
+    }); }); // BEFORE ALL ends
     var user = {
         id: 1,
-        firstname: 'testUser',
-        lastname: 'lastname',
+        username: 'testUser',
         password: 'UshallnotPASS'
     };
     var secret = process.env.TOKEN_SECRET;
-    var spareToken = jsonwebtoken_1.default.sign({
+    var mockToken = jsonwebtoken_1.default.sign({
         user: {
             id: user.id,
-            firstname: user.firstname
+            username: user.username
         }
     }, secret);
     // CREATE
@@ -95,14 +100,14 @@ describe('Orders Handler, all endpoints require a valid user-token', function ()
                 case 0: 
                 // create first order
                 return [4 /*yield*/, request.post('/users/1/orders')
-                        .set('Authorization', "Bearer ".concat(spareToken))
+                        .set('Authorization', "Bearer ".concat(mockToken))
                     // create second order
                 ];
                 case 1:
                     // create first order
                     _a.sent();
                     return [4 /*yield*/, request.post('/users/1/orders')
-                            .set('Authorization', "Bearer ".concat(spareToken))];
+                            .set('Authorization', "Bearer ".concat(mockToken))];
                 case 2:
                     response = _a.sent();
                     expect(response.status).toBe(200);
@@ -121,7 +126,7 @@ describe('Orders Handler, all endpoints require a valid user-token', function ()
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, request.get('/users/1/orders')
-                        .set('Authorization', "Bearer ".concat(spareToken))];
+                        .set('Authorization', "Bearer ".concat(mockToken))];
                 case 1:
                     response = _a.sent();
                     expect(response.status).toBe(200);
@@ -140,7 +145,7 @@ describe('Orders Handler, all endpoints require a valid user-token', function ()
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, request.get('/users/1/orders/1')
-                        .set('Authorization', "Bearer ".concat(spareToken))];
+                        .set('Authorization', "Bearer ".concat(mockToken))];
                 case 1:
                     response = _a.sent();
                     expect(response.status).toBe(200);
@@ -153,13 +158,12 @@ describe('Orders Handler, all endpoints require a valid user-token', function ()
             }
         });
     }); });
-    //
     it('addProduct, expect 200 and order_product obj', function () { return __awaiter(void 0, void 0, void 0, function () {
         var response;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, request.post('/users/1/orders/1/products')
-                        .set('Authorization', "Bearer ".concat(spareToken))
+                        .set('Authorization', "Bearer ".concat(mockToken))
                         .send({
                         quantity: '3',
                         product_id: '1'
@@ -167,7 +171,7 @@ describe('Orders Handler, all endpoints require a valid user-token', function ()
                 case 1:
                     _a.sent();
                     return [4 /*yield*/, request.post('/users/1/orders/1/products')
-                            .set('Authorization', "Bearer ".concat(spareToken))
+                            .set('Authorization', "Bearer ".concat(mockToken))
                             .send({
                             quantity: '5',
                             product_id: '2'
@@ -189,7 +193,7 @@ describe('Orders Handler, all endpoints require a valid user-token', function ()
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, request.put('/users/1/orders/1/close')
-                        .set('Authorization', "Bearer ".concat(spareToken))];
+                        .set('Authorization', "Bearer ".concat(mockToken))];
                 case 1:
                     response = _a.sent();
                     expect(response.status).toBe(200);
@@ -207,7 +211,7 @@ describe('Orders Handler, all endpoints require a valid user-token', function ()
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, request.get('/users/1/orders/complete')
-                        .set('Authorization', "Bearer ".concat(spareToken))];
+                        .set('Authorization', "Bearer ".concat(mockToken))];
                 case 1:
                     response = _a.sent();
                     // console.log(Object.entries(response.body));
@@ -222,7 +226,7 @@ describe('Orders Handler, all endpoints require a valid user-token', function ()
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, request.get('/users/1/orders/1/details')
-                        .set('Authorization', "Bearer ".concat(spareToken))];
+                        .set('Authorization', "Bearer ".concat(mockToken))];
                 case 1:
                     response = _a.sent();
                     expect(response.status).toBe(200);

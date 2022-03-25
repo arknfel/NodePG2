@@ -17,7 +17,7 @@ const index = async (_req: Request, res: Response) => {
 
 const get = async (req: Request, res: Response) => {
   try {
-    const product = await store.get(req.params.id);
+    const product = await store.get(req.params.product_id);
     res.json(product);
   } catch (err) {
     res.status(400).json(`${err}`);
@@ -33,21 +33,22 @@ const create = async (req: Request, res: Response) => {
   }
 };
 
-const hot = async (req: Request, res: Response) => {
+const update = async (req: Request, res: Response) => {
   try {
-    const products = await store.hot();
-    res.json(products);
+    const product = await store.update(req.params.product_id, req.body);
+    res.json(product);
   } catch (err) {
     res.status(400).json(`${err}`);
   }
-};
+}
 
 
 const productsRouter = (app: express.Application) => {
-  app.get('/products', index);
-  app.get('/products/:id', get);  // Show
   app.post('/products', adminAuthToken, create);
-  app.get('/products/trends', hot)
+  app.get('/products', index);
+  app.get('/products/:product_id', get);  // Show
+  app.put('/products/:product_id', adminAuthToken, update);
+
 };
 
 

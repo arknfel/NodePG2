@@ -58,7 +58,7 @@ var UserStore = /** @class */ (function () {
                         return [4 /*yield*/, database_1.default.connect()];
                     case 1:
                         conn = _a.sent();
-                        sql = 'SELECT id, firstname, lastname from users;';
+                        sql = 'SELECT id, username, firstname, lastname, isAdmin from users;';
                         return [4 /*yield*/, conn.query(sql)];
                     case 2:
                         result = _a.sent();
@@ -75,7 +75,7 @@ var UserStore = /** @class */ (function () {
     ;
     UserStore.prototype.get = function (user_id, currentConn) {
         return __awaiter(this, void 0, void 0, function () {
-            var conn, sql, result, user, err_2;
+            var conn, sql, result, err_2;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -83,17 +83,12 @@ var UserStore = /** @class */ (function () {
                         return [4 /*yield*/, (0, utils_1.connAvail)(currentConn, database_1.default)];
                     case 1:
                         conn = _a.sent();
-                        sql = 'SELECT * FROM users WHERE id=($1);';
+                        sql = 'SELECT id, username, firstname, lastname FROM users WHERE id=($1);';
                         return [4 /*yield*/, conn.query(sql, [user_id])];
                     case 2:
                         result = _a.sent();
                         conn.release();
-                        user = result.rows[0];
-                        return [2 /*return*/, {
-                                id: user.id,
-                                firstname: user.firstname,
-                                lastname: user.lastname
-                            }];
+                        return [2 /*return*/, result.rows[0]];
                     case 3:
                         err_2 = _a.sent();
                         throw "unable to get user: ".concat(err_2);
@@ -112,22 +107,22 @@ var UserStore = /** @class */ (function () {
                         return [4 /*yield*/, database_1.default.connect()];
                     case 1:
                         conn = _a.sent();
-                        return [4 /*yield*/, this.userExists(user.firstname, conn)];
+                        return [4 /*yield*/, this.userExists(user.username, conn)];
                     case 2:
                         userExists = _a.sent();
-                        if (userExists.length > 0) {
+                        if (userExists) {
                             return [2 /*return*/, null];
                         }
-                        sql = 'INSERT INTO users (firstname, \
-        lastname, password) \
-        VALUES ($1, $2, $3) RETURNING *;';
+                        sql = "INSERT INTO users (username, firstname, \
+        lastname, password, isAdmin) VALUES ($1, $2, $3, $4, '0') RETURNING *;";
                         hash = bcrypt_1.default.hashSync(user.password + pepper, parseInt(saltRounds));
-                        return [4 /*yield*/, conn.query(sql, [user.firstname, user.lastname, hash])];
+                        return [4 /*yield*/, conn.query(sql, [user.username, user.firstname, user.lastname, hash])];
                     case 3:
                         result = _a.sent();
                         conn.release();
                         return [2 /*return*/, {
                                 id: result.rows[0].id,
+                                username: result.rows[0].username,
                                 firstname: result.rows[0].firstname,
                                 lastname: result.rows[0].lastname
                             }];
@@ -140,39 +135,38 @@ var UserStore = /** @class */ (function () {
         });
     };
     ;
-    UserStore.prototype.userExists = function (firstname, conn) {
+    UserStore.prototype.userExists = function (username, conn) {
         return __awaiter(this, void 0, void 0, function () {
             var sql, result;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         sql = 'SELECT * FROM users \
-      WHERE firstname=($1);';
-                        return [4 /*yield*/, conn.query(sql, [firstname])];
+      WHERE username=($1);';
+                        return [4 /*yield*/, conn.query(sql, [username])];
                     case 1:
                         result = _a.sent();
-                        return [2 /*return*/, result.rows];
+                        return [2 /*return*/, result.rows[0]];
                 }
             });
         });
     };
     ;
-    UserStore.prototype.authenticate = function (firstname, password) {
+    UserStore.prototype.authenticate = function (username, password) {
         return __awaiter(this, void 0, void 0, function () {
-            var conn, result, user;
+            var conn, user;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, database_1.default.connect()];
                     case 1:
                         conn = _a.sent();
-                        return [4 /*yield*/, this.userExists(firstname, conn)];
+                        return [4 /*yield*/, this.userExists(username, conn)];
                     case 2:
-                        result = _a.sent();
+                        user = _a.sent();
                         conn.release();
-                        if (result.length > 0) {
-                            user = result[0];
+                        if (user) {
                             if (bcrypt_1.default.compareSync(password + pepper, user.password)) {
-                                return [2 /*return*/, { id: user.id, firstname: user.firstname }];
+                                return [2 /*return*/, { id: user.id, username: user.username, isadmin: user.isadmin }];
                             }
                         }
                         return [2 /*return*/, null];

@@ -52,17 +52,24 @@ describe("User Model", function () { return __awaiter(void 0, void 0, void 0, fu
                     case 0: return [4 /*yield*/, database_1.default.connect()];
                     case 1:
                         conn = _a.sent();
-                        return [4 /*yield*/, conn.query('TRUNCATE users RESTART IDENTITY CASCADE;')];
+                        return [4 /*yield*/, conn.query("TRUNCATE users RESTART IDENTITY CASCADE;")];
                     case 2:
+                        _a.sent();
+                        return [4 /*yield*/, conn.query("TRUNCATE orders RESTART IDENTITY CASCADE;")];
+                    case 3:
+                        _a.sent();
+                        return [4 /*yield*/, conn.query("TRUNCATE products RESTART IDENTITY CASCADE;")];
+                    case 4:
                         _a.sent();
                         conn.release();
                         return [2 /*return*/];
                 }
             });
-        }); });
+        }); }); // BEFORE ALL ENDS
         user = {
-            firstname: "testUser",
-            lastname: "lastname",
+            username: 'testUser',
+            firstname: "__",
+            lastname: "__",
             password: "UshallnotPASS"
         };
         it('index() returns []', function () { return __awaiter(void 0, void 0, void 0, function () {
@@ -86,8 +93,9 @@ describe("User Model", function () { return __awaiter(void 0, void 0, void 0, fu
                         result = _a.sent();
                         expect(result).toEqual({
                             id: 1,
-                            firstname: 'testUser',
-                            lastname: 'lastname'
+                            username: 'testUser',
+                            firstname: '__',
+                            lastname: '__'
                         });
                         return [2 /*return*/];
                 }
@@ -102,8 +110,9 @@ describe("User Model", function () { return __awaiter(void 0, void 0, void 0, fu
                         result = _a.sent();
                         expect(result).toEqual({
                             id: 1,
-                            firstname: 'testUser',
-                            lastname: 'lastname'
+                            username: 'testUser',
+                            firstname: '__',
+                            lastname: '__'
                         });
                         return [2 /*return*/];
                 }
@@ -116,28 +125,32 @@ describe("User Model", function () { return __awaiter(void 0, void 0, void 0, fu
                     case 0: return [4 /*yield*/, database_1.default.connect()];
                     case 1:
                         conn = _a.sent();
-                        return [4 /*yield*/, store.userExists(user.firstname, conn)];
+                        return [4 /*yield*/, store.userExists(user.username, conn)];
                     case 2:
                         result = _a.sent();
                         conn.release();
-                        expect(result.length).toEqual(1);
+                        expect(result).toBeDefined();
                         return [2 /*return*/];
                 }
             });
         }); });
         it('method authenticate() return User or null', function () { return __awaiter(void 0, void 0, void 0, function () {
-            var result;
+            var authedUser;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, store.authenticate(user.firstname, user.password)];
+                    case 0: return [4 /*yield*/, store.authenticate(user.username, user.password)];
                     case 1:
-                        result = _a.sent();
-                        expect(result === null || result === void 0 ? void 0 : result.id).toEqual(1);
+                        authedUser = _a.sent();
+                        expect(authedUser).toEqual({
+                            id: 1,
+                            username: 'testUser',
+                            isadmin: false
+                        });
                         return [4 /*yield*/, store.authenticate(user.firstname, 'AwrongPass')];
                     case 2:
                         // invalid password
-                        result = _a.sent();
-                        expect(result).toEqual(null);
+                        authedUser = _a.sent();
+                        expect(authedUser).toEqual(null);
                         return [2 /*return*/];
                 }
             });

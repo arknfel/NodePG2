@@ -82,13 +82,12 @@ var get = function (req, res) { return __awaiter(void 0, void 0, void 0, functio
         }
     });
 }); };
-var create = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+var signup = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var newUser, secret, token, err_3;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                if (!req.body.firstname
-                    || !req.body.lastname
+                if (!req.body.username
                     || !req.body.password) {
                     return [2 /*return*/, res.status(401).json('Missing required fields.')];
                 }
@@ -96,6 +95,7 @@ var create = function (req, res) { return __awaiter(void 0, void 0, void 0, func
             case 1:
                 _a.trys.push([1, 3, , 4]);
                 return [4 /*yield*/, store.create({
+                        username: req.body.username,
                         firstname: req.body.firstname,
                         lastname: req.body.lastname,
                         password: req.body.password
@@ -119,15 +119,15 @@ var create = function (req, res) { return __awaiter(void 0, void 0, void 0, func
         }
     });
 }); };
-var login = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+var signin = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var user, secret, token;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                if (!req.body.firstname || !req.body.password) {
+                if (!req.body.username || !req.body.password) {
                     return [2 /*return*/, res.status(401).json('invalid credntials')];
                 }
-                return [4 /*yield*/, store.authenticate(req.body.firstname, req.body.password)];
+                return [4 /*yield*/, store.authenticate(req.body.username, req.body.password)];
             case 1:
                 user = _a.sent();
                 if (user) {
@@ -144,9 +144,9 @@ var login = function (req, res) { return __awaiter(void 0, void 0, void 0, funct
     });
 }); };
 var usersRouter = function (app) {
-    app.get('/users', authz_1.verifyAuthToken, index);
+    app.get('/users', authz_1.adminAuthToken, index);
     app.get('/users/:user_id', authz_1.authzUser, get);
-    app.post('/users/login', login);
-    app.post('/users', create);
+    app.post('/users/login', signin);
+    app.post('/users', signup);
 };
 exports.default = usersRouter;

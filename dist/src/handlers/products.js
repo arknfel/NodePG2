@@ -64,7 +64,7 @@ var get = function (req, res) { return __awaiter(void 0, void 0, void 0, functio
         switch (_a.label) {
             case 0:
                 _a.trys.push([0, 2, , 3]);
-                return [4 /*yield*/, store.get(req.params.id)];
+                return [4 /*yield*/, store.get(req.params.product_id)];
             case 1:
                 product = _a.sent();
                 res.json(product);
@@ -96,16 +96,16 @@ var create = function (req, res) { return __awaiter(void 0, void 0, void 0, func
         }
     });
 }); };
-var hot = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var products, err_4;
+var update = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var product, err_4;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 _a.trys.push([0, 2, , 3]);
-                return [4 /*yield*/, store.hot()];
+                return [4 /*yield*/, store.update(req.params.product_id, req.body)];
             case 1:
-                products = _a.sent();
-                res.json(products);
+                product = _a.sent();
+                res.json(product);
                 return [3 /*break*/, 3];
             case 2:
                 err_4 = _a.sent();
@@ -116,9 +116,9 @@ var hot = function (req, res) { return __awaiter(void 0, void 0, void 0, functio
     });
 }); };
 var productsRouter = function (app) {
+    app.post('/products', authz_1.adminAuthToken, create);
     app.get('/products', index);
-    app.get('/products/:id', get); // Show
-    app.post('/products', authz_1.verifyAuthToken, create);
-    app.get('/products/trends', hot);
+    app.get('/products/:product_id', get); // Show
+    app.put('/products/:product_id', authz_1.adminAuthToken, update);
 };
 exports.default = productsRouter;

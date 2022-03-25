@@ -38,9 +38,9 @@ else if (ENV === 'test') {
 }
 
 else {
-  throw new Error("Could not resolve env for DB, current-env " + `'${ENV}'`);
+  throw new Error("Could not resolve env for DB, current-env: " + `'${ENV}'`);
 }
 
-console.log(`env: ${ENV}`);
+console.log(`env: '${ENV}'`);
 
 export default client;

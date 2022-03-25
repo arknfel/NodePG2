@@ -53,20 +53,27 @@ describe("Order Model", function () {
                     return [4 /*yield*/, conn.query("TRUNCATE users RESTART IDENTITY CASCADE;")];
                 case 2:
                     _a.sent();
-                    // creating a user and a product to satisfy foriegn-key constrains 
-                    return [4 /*yield*/, conn.query("INSERT INTO users (firstname, lastname, password) \
-      VALUES ('testUser', 'lastname', 'UshallnotPASS');")];
+                    return [4 /*yield*/, conn.query("TRUNCATE orders RESTART IDENTITY CASCADE;")];
                 case 3:
+                    _a.sent();
+                    return [4 /*yield*/, conn.query("TRUNCATE products RESTART IDENTITY CASCADE;")];
+                case 4:
+                    _a.sent();
+                    // creating a user and a product to satisfy foriegn-key constrains 
+                    return [4 /*yield*/, conn.query("INSERT INTO users (username, firstname, lastname, password, isAdmin) \
+      VALUES ('testUser', '__', '__', 'UshallnotPASS', '0');")];
+                case 5:
                     // creating a user and a product to satisfy foriegn-key constrains 
                     _a.sent();
                     return [4 /*yield*/, conn.query("INSERT INTO products (name, price) \
-      VALUES ('testProduct01', 42.42);").then(function () { return conn.release(); })];
-                case 4:
+      VALUES ('testProduct01', 42.42);")];
+                case 6:
                     _a.sent();
+                    conn.release();
                     return [2 /*return*/];
             }
         });
-    }); });
+    }); }); // BEFORE ALL ends
     var order = {
         user_id: '1',
         status: 'active'

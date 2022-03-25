@@ -29,11 +29,10 @@ const get = async (req: Request, res: Response) => {
 };
 
 
-const create = async (req: Request, res: Response) => {
+const signup = async (req: Request, res: Response) => {
 
   if (
-    !req.body.firstname
-    || !req.body.lastname
+    !req.body.username
     || !req.body.password
   ) {
     return res.status(401).json('Missing required fields.');
@@ -41,6 +40,7 @@ const create = async (req: Request, res: Response) => {
 
   try {
     const newUser = await store.create({
+      username: req.body.username,
       firstname: req.body.firstname,
       lastname: req.body.lastname,
       password: req.body.password
@@ -59,14 +59,14 @@ const create = async (req: Request, res: Response) => {
 };
 
 
-const login = async (req: Request, res: Response) => {
+const signin = async (req: Request, res: Response) => {
 
-  if (!req.body.firstname || !req.body.password) {
+  if (!req.body.username || !req.body.password) {
     return res.status(401).json('invalid credntials');
   }
 
   const user = await store.authenticate(
-    req.body.firstname,
+    req.body.username,
     req.body.password
   );
 
@@ -83,8 +83,8 @@ const login = async (req: Request, res: Response) => {
 const usersRouter = (app: express.Application) => {
   app.get('/users', adminAuthToken, index);
   app.get('/users/:user_id', authzUser, get);
-  app.post('/users/login', login);
-  app.post('/users', create);
+  app.post('/users/login', signin);
+  app.post('/users', signup);
 }
 
 export default usersRouter;

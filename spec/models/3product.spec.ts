@@ -7,17 +7,19 @@ const productStore = new ProductStore();
 describe("Product Model", () => {
 
   beforeAll(async () => {
-    // Reset table users before testing the order spec
+    // Reset all table users before testing the order spec
     const conn = await client.connect();
     await conn.query("TRUNCATE users RESTART IDENTITY CASCADE;");
+    await conn.query("TRUNCATE orders RESTART IDENTITY CASCADE;");
     await conn.query("TRUNCATE products RESTART IDENTITY CASCADE;");
 
     // creating a user and a product to satisfy foriegn-key constrains 
-    await conn.query("INSERT INTO users (firstname, lastname, password) \
-      VALUES ('testUser', 'lastname', 'UshallnotPASS');")
+    await conn.query("INSERT INTO users (username, firstname, lastname, password, isAdmin) \
+      VALUES ('testUser', '__', '__', 'UshallnotPASS', '0');");
     
     conn.release();
-  });
+  }); // BEFORE ALL ends
+
 
   const product: Product = {
     name: 'testProduct02',
@@ -44,7 +46,7 @@ describe("Product Model", () => {
   });
 
 
-  it('get() returns a product by id', async () => {
+  it('update() returns updated product obj', async () => {
     const productEntry: ProductEntry = {price: '79.99'};
     const result = await productStore.update('1', productEntry);
     expect(result).toEqual({

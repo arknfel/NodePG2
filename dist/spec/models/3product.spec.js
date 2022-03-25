@@ -53,20 +53,23 @@ describe("Product Model", function () {
                     return [4 /*yield*/, conn.query("TRUNCATE users RESTART IDENTITY CASCADE;")];
                 case 2:
                     _a.sent();
-                    return [4 /*yield*/, conn.query("TRUNCATE products RESTART IDENTITY CASCADE;")];
+                    return [4 /*yield*/, conn.query("TRUNCATE orders RESTART IDENTITY CASCADE;")];
                 case 3:
                     _a.sent();
-                    // creating a user and a product to satisfy foriegn-key constrains 
-                    return [4 /*yield*/, conn.query("INSERT INTO users (firstname, lastname, password) \
-      VALUES ('testUser', 'lastname', 'UshallnotPASS');")];
+                    return [4 /*yield*/, conn.query("TRUNCATE products RESTART IDENTITY CASCADE;")];
                 case 4:
+                    _a.sent();
+                    // creating a user and a product to satisfy foriegn-key constrains 
+                    return [4 /*yield*/, conn.query("INSERT INTO users (username, firstname, lastname, password, isAdmin) \
+      VALUES ('testUser', '__', '__', 'UshallnotPASS', '0');")];
+                case 5:
                     // creating a user and a product to satisfy foriegn-key constrains 
                     _a.sent();
                     conn.release();
                     return [2 /*return*/];
             }
         });
-    }); });
+    }); }); // BEFORE ALL ends
     var product = {
         name: 'testProduct02',
         price: '99.99'
@@ -103,7 +106,7 @@ describe("Product Model", function () {
             }
         });
     }); });
-    it('get() returns a product by id', function () { return __awaiter(void 0, void 0, void 0, function () {
+    it('update() returns updated product obj', function () { return __awaiter(void 0, void 0, void 0, function () {
         var productEntry, result;
         return __generator(this, function (_a) {
             switch (_a.label) {

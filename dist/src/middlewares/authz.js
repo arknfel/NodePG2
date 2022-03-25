@@ -3,22 +3,24 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.authzUser = exports.verifyAuthToken = void 0;
+exports.authzUser = exports.adminAuthToken = void 0;
 var jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 var secret = process.env.TOKEN_SECRET;
-var verifyAuthToken = function (req, res, next) {
+var adminAuthToken = function (req, res, next) {
     try {
         var authorizationHeader = req.headers.authorization;
         var token = authorizationHeader.split(' ')[1];
         var decoded = jsonwebtoken_1.default.verify(token, secret);
-        // console.log(decoded);
+        if (!decoded.user.isadmin) {
+            return res.status(401).json('unauthorized');
+        }
         next();
     }
     catch (err) {
         res.status(401).json("Invalid token: ".concat(err));
     }
 };
-exports.verifyAuthToken = verifyAuthToken;
+exports.adminAuthToken = adminAuthToken;
 var authzUser = function (req, res, next) {
     try {
         if (!req.params.user_id) {
@@ -32,7 +34,7 @@ var authzUser = function (req, res, next) {
         var decoded = jsonwebtoken_1.default.verify(token, secret);
         // console.log(decoded);
         if (decoded.user.id !== parseInt(req.params.user_id)) {
-            return res.status(401).json("not authorized");
+            return res.status(401).json("unauthorized");
         }
         next();
     }

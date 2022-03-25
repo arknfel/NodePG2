@@ -27,7 +27,7 @@ else if (ENV === 'test') {
     });
 }
 else {
-    throw new Error("Could not resolve env for DB, current-env " + "'".concat(ENV, "'"));
+    throw new Error("Could not resolve env for DB, current-env: " + "'".concat(ENV, "'"));
 }
-console.log("env: ".concat(ENV));
+console.log("env: '".concat(ENV, "'"));
 exports.default = client;

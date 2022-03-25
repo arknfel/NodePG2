@@ -14,6 +14,7 @@ export type ProductEntry = {
 
 
 export class ProductStore {
+
   async index(): Promise <(Product)[]> {
     try {
       const conn = await client.connect();
@@ -26,11 +27,11 @@ export class ProductStore {
     }
   };
 
-  async get(id: string): Promise <Product> {
+  async get(product_id: string): Promise <Product> {
     try {
       const conn = await client.connect();
       const sql = 'SELECT * from products WHERE id=($1);';
-      const result = await conn.query(sql, [id]);
+      const result = await conn.query(sql, [product_id]);
       conn.release();
       return result.rows[0];
 
@@ -57,7 +58,7 @@ export class ProductStore {
   };
 
 
-  async update(id: number|string, updates: ProductEntry): Promise<Product> {
+  async update(product_id: number|string, updates: ProductEntry): Promise<Product> {
     try {
       const conn = await client.connect();
 
@@ -73,7 +74,7 @@ export class ProductStore {
       const sql = `UPDATE products SET ${queryParts} \
         WHERE id=($1) RETURNING *;`;
 
-      const result = await conn.query(sql, [id, ...vals]);
+      const result = await conn.query(sql, [product_id, ...vals]);
       conn.release();
       return result.rows[0];
 
@@ -95,23 +96,6 @@ export class ProductStore {
   //   }
   // };
 
-  // DASHBOARD
-  async hot(): Promise <(Product)[]> {
-    try {
-      const conn = await client.connect();
-
-      const sql = 'SELECT * FROM products \
-        WHERE id in (SELECT TOP 5 product_id, sum(quantity) as Q \
-        GROUP BY product_id ORDER BY Q DESC);';
-
-      const result = await conn.query(sql);
-      conn.release();
-      return result.rows;
-  
-    } catch (err) {
-      throw new Error(`unable to generate trends report: ${err}`);
-    }
-  }
 };
 
 
