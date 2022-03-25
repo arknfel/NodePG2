@@ -1,6 +1,6 @@
 # Storefront Backend REST API
 
-An MVP NodeJS, Typescript based REST API application of a storefront where users can sign up, sign in, make orders, add products and to their orders, view their orders, view available products and get detailed order views along with some dashboard views.  
+An MVP NodeJS, Typescript based REST API application of a storefront where users can signup, signin, make orders, add products and to their orders, view their orders, view available products and get detailed order views along with some dashboard views.  
   
 The API app offers minimal administration functionality on users and products which can be easily extended.
 
@@ -20,7 +20,7 @@ $ git clone https://github.com/arknfel/NodePG2.git -b sp02
 It is worth mentioning that a valid .env file is critical and essential for a successful installation and a docker build.
 
 If for some reason the cloned project folder did not have the `.env` file,  
-a .env file should be created at the project's root directory, same directory level of the package.json file, example: `~/cloned_project/NodePG2/.env`  
+a .env file should be created at the project's root directory, same directory level of the `package.json` file, example: `~/cloned_repo_dir/NodePG2/.env`  
 
 .env file content:
 ```text
@@ -65,10 +65,19 @@ to install all dependencies:
 ```bash
 $ npm install
 ```
-### Unit Tests
+### Unit Tests & Usage
 If everything is setup correctly, running the following npm script will run all the unit test on the API application and all Model and Handler tests should pass:
 ```bash
 $ npm run test
+```  
+
+To start the Typescript based server
+```bash
+$ npm run dev
+```  
+To start the JS based server
+```bash
+$ npm run start
 ```
 ##
 ## End-points & Usage
@@ -78,11 +87,92 @@ with each handling a number of available end-points.
 Users can signup/signin to acquire a token. Most end-points expects a valid user or admin token,
 specifically end-points that are to serve a specific user.
 
-There are two types of tokens, user and admin token.
+There are two types of tokens, user and admin token.  
 
+The base URL of the API by default is:
+`http://127.0.0.1:3000`  
+The following end-point paths are to be appended to the base URL when submitting HTTP requests to the API.
 ### Users
-GET 
+GET `/users` to veiw all current users, requires an admin token.  
+GET `/users/<user_id>` to view a user details by user_id  
 
+POST `/users` to signup, expects a paradigm of the following json:  
+```json
+{
+  "username": "testUser",
+  "firstname": "__",
+  "lastname": "__",
+  "password": "UshallnotPASS"
+}
+```  
 
+POST`/users/login` to login, expects username and password in the json payload of the request:  
+```json
+{
+  "username": "testUser",
+  "password": "UshallnotPASS"
+}
+```  
+### Products
+GET `/products` to view all available products.  
+GET `/products/<product_id>` to view product details by product_id.  
+
+POST `/products` to create a product, requires a valid admin, token, json payload:
+```json
+{
+  "name": "testProduct01",
+  "price": "42.42"
+}
+```  
+PUT `/products/product_id` to update a product, requires a valid admin token, json payload:  
+```json
+{
+  "price": "42"
+}
+```
+### Orders
+All the orders end-points require a valid user or admin token.  
+
+GET `/users/<user_id>/orders` returns all active orders of the user.  
+GET `/users/<user_id>/orders/complete` returns all complete orders of a user.  
+GET `/users/<user_id>/orders/<order_id>` to get details of an order by order_id.  
+GET `/users/<user_id>/orders/<order_id>/details` returns a detailed check of an order, similar to the following json:  
+```json
+{
+  "order": { "id": 1, "user_id": "1", "status": "complete" },
+  "products": [
+    {
+      "name": "testProduct01",
+      "quantity": "3",
+      "price": "$42.42",
+      "cost": "$127.26"
+    },
+    {
+      "name": "testProduct02",
+      "quantity": "5",
+      "price": "$10.00",
+      "cost": "$50.00"
+    }
+  ]
+}
+```  
+
+POST `/users/<user_id>/orders` to create an order.  
+POST `/users/<user_id>/orders/<order_id>/products` to add a product to an order, json payload:
+```json
+{
+  "quantity": "3",
+  "product_id": "1"
+}
+```  
+If query argument parameter `?status=complete` is added while adding a product, the product will be added and order will be closed:  
+
+POST `/users/<user_id>/orders/<order_id>/products?status=complete`
+
+PUT `/users/:user_id/orders/:order_id/close` to close an order.  
+
+Most of the end-points respond with a json object related to the action that was taken, for example, POST `/users/<user_id>/orders` will respond with a josn object of the created order.
+
+##
 ## License
-[MIT](https://choosealicense.com/licenses/mit/)
+[MIT](https://github.com/arknfel/NodePG2/blob/sp02/LICENSE)
