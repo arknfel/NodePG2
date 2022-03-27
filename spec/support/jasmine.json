@@ -1,9 +1,9 @@
 {
   "spec_dir": "dist/spec",
   "spec_files": [
-    "**/user[.]spec[.]js",
+    "**/user.spec.js",
     "**/order.spec.js",
-    "**/product[.]spec[.]js",
+    "**/product.spec.js",
     "**/dashboard.spec.js",
     "**/users.spec.js",
     "**/orders.spec.js",

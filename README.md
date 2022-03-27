@@ -13,7 +13,7 @@ preferably ```Docker version 20.10.12``` or above.
 ## Deployment & Dev. Environment
 To clone the project:
 ```bash
-$ git clone https://github.com/arknfel/NodePG2.git -b sp02
+git clone https://github.com/arknfel/NodePG2.git -b sp02
 ```  
 #
 ### The .env File
@@ -43,47 +43,47 @@ except `POSTGRES_HOST` and `ENV=dev`, these should remain as they are.
 
 Compose a Postgres database container:
 ```bash
-$ docker-compose -f docker-compose.yaml up
+docker-compose -f docker-compose.yaml up
 ```
 You can verify if the container is running by:  
 ```bash
-$ docker ps
-$ docker exec -it <containerID> bash
+docker ps
+docker exec -it <containerID> bash
 ```
 from there, the terminal is connected to the container, the following command should connect to the sfdb_dev database:
 ```bash
-$ psql -U <POSTGRES_USER> -d <POSTGRES_DB>
+psql -U <POSTGRES_USER> -d <POSTGRES_DB>
 ```
 given the above .env file:
 ```bash
-$ psql -U arknfel -d sfdb_dev
+psql -U arknfel -d sfdb_dev
 ```
 
 ### Dependencies
 Make sure you are at the project root directory, same directory level as the `package.json` file,  
 to install all dependencies:
 ```bash
-$ npm install
+npm install
 ```
 ### Unit Tests & Usage
 If everything is setup correctly, running the following npm script will run all the unit tests on the API application and all Model and Handler specs should pass:
 ```bash
-$ npm run test
+npm run test
 ```  
 
 To get started and test the API endpoints via a tool like Postman, the first thing that we need to do,  
 is to apply all migrations to sfdb_dev:
 ```bash
-$ db-migrate -e dev up
+db-migrate -e dev up
 ```
 
 We can then start the Typescript based server:
 ```bash
-$ npm run dev
+npm run dev
 ```  
 or start the JS based server:
 ```bash
-$ npm run start
+npm run start
 ```
 ##
 ## End-points & Usage
