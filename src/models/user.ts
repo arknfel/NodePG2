@@ -88,25 +88,34 @@ export class UserStore {
   async userExists (username: string, conn: PoolClient): Promise<UserEntry> {
     const sql = 'SELECT * FROM users \
       WHERE username=($1);';
-    const result = await conn.query(sql, [username]);
-    return result.rows[0];
+    
+    try {
+      const result = await conn.query(sql, [username]);
+      return result.rows[0];
+    } catch (err) {
+      throw new Error(`Unable to check user:\n\t${err}`);
+    }
   };
 
   async authenticate(
     username: string, password: string
   ): Promise<UserEntry|null> {
 
-    const conn = await client.connect();
-    const user = await this.userExists(username, conn);
-    conn.release();
+    try {
+      const conn = await client.connect();
+      const user = await this.userExists(username, conn);
+      conn.release();
 
-    if (user) { 
+      if (user) { 
 
-      if (bcrypt.compareSync(password + pepper, user.password as string)) {
-        return {id: user.id, username: user.username, isadmin: user.isadmin};
+        if (bcrypt.compareSync(password + pepper, user.password as string)) {
+          return {id: user.id, username: user.username, isadmin: user.isadmin};
+        }
       }
-    }
 
-    return null
+      return null
+    } catch (err) {
+      throw new Error(`Unable to auth user:\n\t${err}`);
+    }
   };
 }

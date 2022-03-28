@@ -4,19 +4,19 @@ An MVP NodeJS, Typescript based REST API application of a storefront where users
   
 The API app offers minimal administration functionality on users and products which can be easily extended.
 
-## Requirements
+## 1. Requirements
 The API ideally runs on
 ```NodeJS v16.14.0```  
 Expects a composed Postgres database container using ```Docker```  
 preferably ```Docker version 20.10.12``` or above.
 
-## Deployment & Dev. Environment
+## 2. Deployment & Dev. Environment
 To clone the project:
 ```bash
 git clone https://github.com/arknfel/NodePG2.git -b sp02
 ```  
 #
-### The .env File
+### 2.1 The .env File
 It is worth mentioning that a valid .env file is critical and essential for a successful installation and a docker build.
 
 If for some reason the cloned project folder did not have the `.env` file,  
@@ -39,7 +39,27 @@ It is important to note that the POSTGRES variables are order-sensitive due to h
 All of the variables values in the .env file are up to personal preference as long as the db names match the ones in the package.json scripts,  
 except `POSTGRES_HOST` and `ENV=dev`, these should remain as they are.
 
-### Database Container
+### 2.2 Database Container
+
+The project is using Postgres as the database engine,
+via docker-compose and the docker-compose.yaml, we will be composing a Postgres image as our database container that listens on PORT 5432 by default:
+```yaml
+version: '3.9'
+
+services:
+  DB-02:
+    image: postgres
+    container_name: DB-02
+    ports:
+      - '5432:5432'
+    env_file:
+      - .env
+    volumes:
+      - 'DB-02:/var/lib/postgresql/data'
+
+volumes:
+  DB-02:
+```
 
 Compose a Postgres database container:
 ```bash
@@ -59,13 +79,13 @@ given the above .env file:
 psql -U arknfel -d sfdb_dev
 ```
 
-### Dependencies
+### 2.3 Dependencies
 Make sure you are at the project root directory, same directory level as the `package.json` file,  
 to install all dependencies:
 ```bash
 npm install
 ```
-### Unit Tests & Usage
+### 2.4 Specs & Usage
 If everything is setup correctly, running the following npm script will run all the unit tests on the API application and all Model and Handler specs should pass:
 ```bash
 npm run test
@@ -86,7 +106,7 @@ or start the JS based server:
 npm run start
 ```
 ##
-## End-points & Usage
+## 3. End-points
 The REST API has three main handlers: Users, Orders, and Products
 with each handling a number of available end-points.  
 
@@ -104,6 +124,9 @@ The admin user can now signin to acquire an admin token.
 
 The base URL of the API by default is:
 `http://127.0.0.1:3000`  
+
+The express server will be listening on PORT `3000` by default.  
+
 The following end-point paths are to be appended to the base URL when submitting HTTP requests to the API.
 ### Users
 GET `/users` to veiw all current users, requires an admin token.  
