@@ -108,7 +108,7 @@ var signup = function (req, res) { return __awaiter(void 0, void 0, void 0, func
                 secret = process.env.TOKEN_SECRET;
                 token = jsonwebtoken_1.default.sign({ user: newUser }, secret);
                 res.setHeader('Authorization', "Bearer ".concat(token));
-                res.json('token generated');
+                res.json("token generated: ".concat(token));
                 return [3 /*break*/, 4];
             case 3:
                 err_3 = _a.sent();
@@ -134,7 +134,7 @@ var signin = function (req, res) { return __awaiter(void 0, void 0, void 0, func
                     secret = process.env.TOKEN_SECRET;
                     token = jsonwebtoken_1.default.sign({ user: user }, secret);
                     res.setHeader('Authorization', "Bearer ".concat(token));
-                    res.json('token generated');
+                    res.json("token generated: ".concat(token));
                 }
                 else {
                     res.status(401).json('User does not exist, may need to signup');

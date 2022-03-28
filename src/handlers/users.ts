@@ -50,7 +50,7 @@ const signup = async (req: Request, res: Response) => {
     const secret = (process.env.TOKEN_SECRET as unknown) as Secret;
     const token = jwt.sign({ user: newUser }, secret);
     res.setHeader('Authorization', `Bearer ${token}`);
-    res.json('token generated');
+    res.json(`token generated: ${token}`);
   
   } catch (err) {
     res.status(400);
@@ -74,7 +74,7 @@ const signin = async (req: Request, res: Response) => {
     const secret = (process.env.TOKEN_SECRET as unknown) as Secret;
     var token = jwt.sign({ user: user }, secret);
     res.setHeader('Authorization', `Bearer ${token}`);
-    res.json('token generated');
+    res.json(`token generated: ${token}`);
   } else {
     res.status(401).json('User does not exist, may need to signup');
   }

@@ -82,7 +82,7 @@ describe('Users Handler', function () {
         }
     }, secret);
     it('signup() expects 200', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var response;
+        var response, token;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, request.post('/users')
@@ -94,14 +94,15 @@ describe('Users Handler', function () {
                     })];
                 case 1:
                     response = _a.sent();
+                    token = response.headers['authorization'].split(' ')[1];
                     expect(response.status).toBe(200);
-                    expect(response.body).toEqual('token generated');
+                    expect(response.body).toEqual("token generated: ".concat(token));
                     return [2 /*return*/];
             }
         });
     }); });
     it('signin() expects 200', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var response;
+        var response, token;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, request.post('/users/login')
@@ -111,9 +112,10 @@ describe('Users Handler', function () {
                     })];
                 case 1:
                     response = _a.sent();
+                    token = response.headers['authorization'].split(' ')[1];
                     // console.log('token ' + response.headers['authorization'].split(' ')[1]);
                     expect(response.status).toBe(200);
-                    expect(response.body).toEqual('token generated');
+                    expect(response.body).toEqual("token generated: ".concat(token));
                     return [2 /*return*/];
             }
         });

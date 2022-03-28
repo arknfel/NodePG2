@@ -50,8 +50,9 @@ describe('Users Handler', () => {
       password: 'UshallnotPASS'
     });
 
+    const token = response.headers['authorization'].split(' ')[1];
     expect(response.status).toBe(200);
-    expect(response.body).toEqual('token generated');
+    expect(response.body).toEqual(`token generated: ${token}`);
   });
 
   
@@ -61,9 +62,10 @@ describe('Users Handler', () => {
       username: user.username,
       password: user.password
     });
+    const token = response.headers['authorization'].split(' ')[1];
     // console.log('token ' + response.headers['authorization'].split(' ')[1]);
     expect(response.status).toBe(200);
-    expect(response.body).toEqual('token generated');
+    expect(response.body).toEqual(`token generated: ${token}`);
   });
 
 
