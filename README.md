@@ -1,6 +1,6 @@
 # Storefront Backend REST API
 
-An MVP NodeJS, Typescript based REST API application of a storefront where users can signup, signin, make orders, add products and to their orders, view their orders, view available products and get detailed order views along with some dashboard views.  
+An MVP NodeJS, Typescript based REST API application of a storefront where users can signup, signin, make orders, add products to their orders, view their orders, view available products and get detailed order views along with some dashboard views.  
   
 The API app offers minimal administration functionality on users and products which can be easily extended.
 
@@ -42,7 +42,7 @@ except `POSTGRES_HOST` and `ENV=dev`, these should remain as they are.
 ### 2.2 Database Container
 
 The project is using Postgres as the database engine,
-via docker-compose and the docker-compose.yaml, we will be composing a Postgres image as our database container that listens on PORT 5432 by default:
+via docker-compose and the docker-compose.yaml, we will be composing a Postgres image as our database container that listens on PORT `5432` by default:
 ```yaml
 version: '3.9'
 
@@ -86,7 +86,7 @@ to install all dependencies:
 npm install
 ```
 ### 2.4 Specs & Usage
-If everything is setup correctly, running the following npm script will run all the unit tests on the API application and all Model and Handler specs should pass:
+If everything is setup correctly, running the following npm script will run all the tests and all Model and Handler specs should pass:
 ```bash
 npm run test
 ```  
@@ -113,9 +113,9 @@ with each handling a number of available end-points.
 Users can signup/signin to acquire a token. Most end-points expects a valid user or admin token,
 specifically end-points that are to serve a specific user.
 
-There are two types of tokens, user and admin token.  
+There are two types of tokens, user and admin tokens.  
 
-An admin user can be created by signing up,
+An admin user can be created by signing up,  
 flip the  isadmin boolan flag via a db query, for user_id=1:
 ```sql
 UPDATE users SET isadmin=true WHERE id=1;
